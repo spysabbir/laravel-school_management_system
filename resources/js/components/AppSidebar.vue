@@ -8,13 +8,52 @@ import { Link } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+
+// Get permissions from the page props
+const permissions = computed<string[]>(() => usePage().props.permissions as string[]);
+
+// Check if the user has a specific permission
+const hasPermission = (permission: string) => {
+    return permissions.value.includes(permission);
+};
+
+// Define main navigation items
+const mainNavItems = computed(() => {
+    return [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutGrid,
+            show: true, // Always show
+        },
+        {
+            title: 'Roles',
+            href: '/roles',
+            icon: LayoutGrid,
+            show: hasPermission('Read Role'), // Show only if the user has permission
+        },
+        {
+            title: 'Permissions',
+            href: '/permissions',
+            icon: LayoutGrid,
+            show: hasPermission('Read Permission'),
+        },
+        {
+            title: 'Roles & Permissions',
+            href: '/roles-permissions',
+            icon: LayoutGrid,
+            show: hasPermission('Read Role Permission'),
+        },
+        {
+            title: 'Users',
+            href: '/users',
+            icon: LayoutGrid,
+            show: hasPermission('Read User'),
+        },
+    ].filter(item => item.show); // Filter out items that should not be shown
+});
 
 const footerNavItems: NavItem[] = [
     {
