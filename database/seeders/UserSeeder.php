@@ -37,6 +37,14 @@ class UserSeeder extends Seeder
         ]);
         $teacher->assignRole(Role::findByName('Teacher'));
 
+        // Create Staff
+        $staff = User::create([
+            'name' => 'Staff',
+            'email' => 'staff@spysabbir.com',
+            'password' => bcrypt('password'),
+        ]);
+        $staff->assignRole(Role::findByName('Staff'));
+
         // Create Student
         $student = User::create([
             'name' => 'Student',

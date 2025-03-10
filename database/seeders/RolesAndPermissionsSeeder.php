@@ -19,6 +19,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'Super Admin',
             'Admin',
             'Teacher',
+            'Staff',
             'Student',
             'Parent',
         ];
