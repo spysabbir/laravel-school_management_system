@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Illuminate\Database\Seeder;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
@@ -28,51 +28,36 @@ class RolesAndPermissionsSeeder extends Seeder
             Role::firstOrCreate(['name' => $role]);
         }
 
-        // Create Permissions
+        // Create permissions
         $permissions = [
-            'Role Management' => [
-                'Create Role', 'Read Role', 'Update Role', 'Delete Role',
+            'Roles And Permissions Management' => [
+                'Read Roles And Permissions', 'Create Role', 'Delete Role', 'Assign Role Permission', 'Revoke Role Permission',
             ],
-            'Permission Management' => [
-                'Create Permission', 'Read Permission', 'Update Permission', 'Delete Permission',
-            ],
-            'Role Permission Management' => [
-                'Assign Role Permission', 'Read Role Permission', 'Revoke Role Permission',
-            ],
-            'User Management' => [
-                'Create User', 'Read User', 'Update User', 'Delete User',
+            'Users Management' => [
+                'Read Users', 'Create User', 'Update User', 'Delete User',
             ],
         ];
 
-        foreach ($permissions as $group => $permissionNames) {
+        foreach ($permissions as $group_name => $permissionNames) {
             foreach ($permissionNames as $name) {
-                Permission::firstOrCreate(['name' => $name, 'group' => $group]);
+                Permission::firstOrCreate(['name' => $name, 'group_name' => $group_name]);
             }
         }
 
-        // Assign Permissions to Roles
+        // Assign permissions to roles
         $roleHasPermissions = [
-            'Super Admin' => [
-                'Role Management' => ['Create Role', 'Read Role', 'Update Role', 'Delete Role'],
-                'Permission Management' => ['Create Permission', 'Read Permission', 'Update Permission', 'Delete Permission'],
-                'Role Permission Management' => ['Assign Role Permission', 'Read Role Permission', 'Revoke Role Permission'],
-                'User Management' => ['Create User', 'Read User', 'Update User', 'Delete User'],
-            ],
             'Admin' => [
-                'User Management' => ['Create User', 'Read User', 'Update User', 'Delete User'],
+                'Roles And Permissions Management' => ['Read Roles And Permissions', 'Create Role', 'Delete Role', 'Assign Role Permission', 'Revoke Role Permission'],
+                'Users Management' => ['Read Users', 'Create User', 'Update User', 'Delete User'],
             ],
         ];
 
         foreach ($roleHasPermissions as $roleName => $permissionGroups) {
             $role = Role::where('name', $roleName)->first();
-            if ($role) {
-                foreach ($permissionGroups as $group => $permissionNames) {
-                    foreach ($permissionNames as $name) {
-                        $permission = Permission::where('name', $name)->first();
-                        if ($permission && !$role->hasPermissionTo($permission)) {
-                            $role->givePermissionTo($permission);
-                        }
-                    }
+            foreach ($permissionGroups as $group_name => $permissionNames) {
+                foreach ($permissionNames as $name) {
+                    $permission = Permission::where('name', $name)->first();
+                    $role->givePermissionTo($permission);
                 }
             }
         }

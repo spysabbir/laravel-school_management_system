@@ -4,43 +4,43 @@ import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Users, Lock } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
-
 import { computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { Auth } from '@/types';
 
-// Get permissions from the page props
-const permissions = computed<string[]>(() => usePage().props.userPermissions as string[]);
+const auth = computed(() => usePage().props.auth as Auth);
 
-// Check if the user has a specific permission
 const hasPermission = (permission: string) => {
-    return permissions.value.includes(permission);
+    if (auth.value.role === 'Super Admin') {
+        return true;
+    }
+
+    return auth.value.hasPermission[permission] || false;
 };
 
-// Define main navigation items
 const mainNavItems = computed(() => {
     return [
         {
             title: 'Dashboard',
             href: '/dashboard',
             icon: LayoutGrid,
-            show: true, // Always show
+            show: true,
         },
         {
-            title: 'Roles & Permissions',
-            href: '/roles-permissions',
-            icon: Lock,
-            show: hasPermission('Read Role Permission'),
+            title: 'Roles And Permissions',
+            href: '/roles-and-permissions',
+            icon: LayoutGrid,
+            show: hasPermission('Read Roles And Permissions'),
         },
         {
             title: 'Users',
             href: '/users',
-            icon: Users,
-            show: hasPermission('Read User'),
+            icon: LayoutGrid,
+            show: hasPermission('Read Users'),
         },
-    ].filter(item => item.show); // Filter out items that should not be shown
+    ].filter(item => item.show);
 });
 
 const footerNavItems: NavItem[] = [

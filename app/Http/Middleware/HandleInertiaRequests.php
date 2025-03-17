@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Tighten\Ziggy\Ziggy;
+use Spatie\Permission\Models\Permission;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,21 +37,27 @@ class HandleInertiaRequests extends Middleware
      * @return array<string, mixed>
      */
     public function share(Request $request): array
-{
-    // Split the random quote into message and author
-    [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
+    {
+        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-    // Merge all shared data into a single array
-    return array_merge(parent::share($request), [
-        'name' => config('app.name'),
-        'quote' => [
-            'message' => trim($message),
-            'author' => trim($author),
-        ],
-        'auth' => [
-            'user' => $request->user(),
-        ],
-        'userPermissions' => fn () => $request->user() ? $request->user()->getAllPermissions()->pluck('name') : [],
-    ]);
-}
+        return [
+            ...parent::share($request),
+            'name' => config('app.name'),
+            'quote' => ['message' => trim($message), 'author' => trim($author)],
+            'auth' => [
+                'user' => $request->user(),
+                'role' => $request->user()?->roles->first()?->name,
+                'hasPermission' => $request->user()?->getPermissionsViaRoles()
+                    ->map(function (Permission $permission) {
+                        return [$permission['name'] => auth()->user()->can($permission['name'])];
+                    })
+                    ->collapse()
+                    ->all(),
+            ],
+            'ziggy' => [
+                ...(new Ziggy)->toArray(),
+                'location' => $request->url(),
+            ],
+        ];
+    }
 }
