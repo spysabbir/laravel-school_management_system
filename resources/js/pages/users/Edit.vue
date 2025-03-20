@@ -11,28 +11,34 @@ import { computed } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Create User',
+        title: 'Edit User',
         href: '/users',
     },
 ];
 
+const { currentUser } = defineProps<{
+    currentUser: {
+        id: number;
+        name: string;
+        email: string;
+    };
+}>();
+
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
+    name: currentUser.name,
+    email: currentUser.email,
+    _method: 'PUT',
 });
 
 const submit = () => {
-    form.post(route('users.store'), {
-        onFinish: () => form.reset('password'),
-    });
+    form.post(route('users.update', currentUser.id));
 };
 
 const isProcessing = computed(() => form.processing);
 </script>
 
 <template>
-    <Head title="Create User" />
+    <Head title="Edit User" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -54,15 +60,9 @@ const isProcessing = computed(() => form.processing);
                             <InputError :message="form.errors.email" />
                         </div>
 
-                        <div class="grid gap-2">
-                            <Label for="password">Password</Label>
-                            <Input id="password" type="password" :tabindex="4" autocomplete="new-password" v-model="form.password" placeholder="Password" />
-                            <InputError :message="form.errors.password" />
-                        </div>
-
-                        <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="isProcessing">
+                        <Button type="submit" class="mt-2 w-full" tabindex="4" :disabled="isProcessing">
                             <LoaderCircle v-if="isProcessing" class="h-4 w-4 animate-spin" />
-                            Create account
+                            Update account
                         </Button>
                     </div>
                 </form>

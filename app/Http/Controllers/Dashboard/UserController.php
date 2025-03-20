@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller implements HasMiddleware
 {
@@ -22,5 +24,37 @@ class UserController extends Controller implements HasMiddleware
     {
         $users = User::all();
         return inertia('users/Index', ['users' => $users]);
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8',
+        ]);
+
+        $data['password'] = Hash::make($request->password);
+
+        User::create($data);
+
+        return redirect()->route('users')->with('success', 'User created successfully.');
+    }
+
+    public function edit(User $user)
+    {
+        return inertia('users/Edit', ['currentUser' => $user]);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update($data);
+
+        return redirect()->route('users')->with('success', 'User updated successfully.');
     }
 }

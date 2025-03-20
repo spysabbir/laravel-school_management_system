@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { FlexRender, useVueTable, getCoreRowModel, getPaginationRowModel, getFilteredRowModel , getSortedRowModel } from '@tanstack/vue-table'
 
+import { toast } from 'vue-sonner'
+
 import { ArrowUpDown, ChevronDown, Edit, Trash } from 'lucide-vue-next'
-import { h, ref, computed } from 'vue'
+import { h, ref, computed, onMounted, watch } from 'vue'
 
 import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/vue-table'
 import { valueUpdater } from '@/lib/utils'
@@ -21,46 +23,50 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export interface Payment {
-    id: string
-    amount: number
-    status: 'pending' | 'processing' | 'success' | 'failed'
-    email: string
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    avatar: string;
+}
+const users = defineProps<{
+    users: User[];
+}>();
+
+interface Flash {
+    success?: null;
+    error?: null;
 }
 
-const data: Payment[] = [
-    { id: 'm5gr84i9', amount: 316, status: 'success', email: 'ken99@yahoo.com' },
-    { id: '3u1reuv4', amount: 242, status: 'success', email: 'Abe45@gmail.com' },
-    { id: 'derv1ws0', amount: 837, status: 'processing', email: 'Monserrat44@gmail.com' },
-    { id: '5kma53ae', amount: 874, status: 'success', email: 'Silas22@gmail.com' },
-    { id: 'bhqecj4p', amount: 721, status: 'failed', email: 'carmella@hotmail.com' },
-    { id: 'm5gr84i9', amount: 316, status: 'success', email: 'ken99@yahoo.com' },
-    { id: '3u1reuv4', amount: 242, status: 'success', email: 'Abe45@gmail.com' },
-    { id: 'derv1ws0', amount: 837, status: 'processing', email: 'Monserrat44@gmail.com' },
-    { id: '5kma53ae', amount: 874, status: 'success', email: 'Silas22@gmail.com' },
-    { id: 'bhqecj4p', amount: 721, status: 'failed', email: 'carmella@hotmail.com' },
-    { id: 'm5gr84i9', amount: 316, status: 'success', email: 'ken99@yahoo.com' },
-    { id: '3u1reuv4', amount: 242, status: 'success', email: 'Abe45@gmail.com' },
-    { id: 'derv1ws0', amount: 837, status: 'processing', email: 'Monserrat44@gmail.com' },
-    { id: '5kma53ae', amount: 874, status: 'success', email: 'Silas22@gmail.com' },
-    { id: 'bhqecj4p', amount: 721, status: 'failed', email: 'carmella@hotmail.com' },
-    { id: 'm5gr84i9', amount: 316, status: 'success', email: 'ken99@yahoo.com' },
-    { id: '3u1reuv4', amount: 242, status: 'success', email: 'Abe45@gmail.com' },
-    { id: 'derv1ws0', amount: 837, status: 'processing', email: 'Monserrat44@gmail.com' },
-    { id: '5kma53ae', amount: 874, status: 'success', email: 'Silas22@gmail.com' },
-    { id: 'bhqecj4p', amount: 721, status: 'failed', email: 'carmella@hotmail.com' },
-];
+onMounted(() => {
+    watch(() => usePage<{ flash: Flash }>().props.flash,
+    (flash: Flash) => {
+        if (flash.success) {
+            toast.success(flash.success);
+            flash.success = null;
+        }
+    }, { immediate: true });
+});
 
-const columns: ColumnDef<Payment>[] = [
+// Reactive data
+const data = ref(users.users);
+
+// Table columns
+const columns: ColumnDef<User>[] = [
     {
         accessorKey: 'id',
         header: 'ID',
         cell: ({ row }) => h('div', row.getValue('id')),
     },
     {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('status')),
+        accessorKey: 'name',
+        header: ({ column }) => {
+            return h(Button, {
+                variant: 'ghost',
+                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+            }, () => ['Name', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]);
+        },
+        cell: ({ row }) => h('div', row.getValue('name')),
     },
     {
         accessorKey: 'email',
@@ -68,16 +74,18 @@ const columns: ColumnDef<Payment>[] = [
             return h(Button, {
                 variant: 'ghost',
                 onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-            }, () => ['Email', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+            }, () => ['Email', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]);
         },
         cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('email')),
     },
     {
-        accessorKey: 'amount',
-        header: () => h('div', { class: 'text-right' }, 'Amount'),
+        accessorKey: 'avatar',
+        header: 'Avatar',
         cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('amount'))
-            return h('div', { class: 'text-right font-medium' }, amount)
+            const avatarUrl = row.getValue('avatar');
+            return avatarUrl
+                ? h('img', { src: avatarUrl, alt: row.getValue('name'), class: 'h-8 w-8 rounded-full' })
+                : h('div', 'No Avatar');
         },
     },
     {
@@ -85,89 +93,91 @@ const columns: ColumnDef<Payment>[] = [
         header: 'Actions',
         cell: ({ row }) => {
             return h('div', { class: 'flex gap-2' }, [
-                h(Button, {
-                    variant: 'ghost',
-                    size: 'sm',
-                    onClick: () => handleEdit(row.original),
-                }, () => [h(Edit, { class: 'h-4 w-4' })]),
-                h(Button, {
-                    variant: 'ghost',
-                    size: 'sm',
-                    onClick: () => handleDelete(row.original),
-                }, () => [h(Trash, { class: 'h-4 w-4 text-red-500' })]),
+                // Edit button with icon using Link component
+                h(Link, { href: `/users/${row.getValue('id')}/edit`, class: 'btn btn-indigo-500 dark:bg-indigo-600 px-2 py-1 rounded' }, () => [
+                    h(Edit, { class: 'h-4 w-4' }),
+                ]),
+                // Delete button with icon using Button component
+                h(Button, { variant: 'outline', class: 'btn btn-red-500 dark:bg-red-600 px-2 py-1 rounded', onClick: () => handleDelete(row.getValue('id')) }, () => [
+                    h(Trash, { class: 'h-4 w-4' }),
+                ]),
             ]);
         },
     },
-]
-
-// Handle edit action
-const handleEdit = (row: Payment) => {
-    console.log('Edit:', row);
-};
+];
 
 // Handle delete action
-const handleDelete = (row: Payment) => {
-    console.log('Delete:', row);
+const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this user?')) {
+        const response = axios.delete(`/users/${id}`);
+        if (response.status === 204) {
+            toast.success('User deleted successfully.');
+            data.value = data.value.filter((user) => user.id !== id);
+        } else {
+            toast.error('Failed to delete user.');
+        }
+    }
 };
+// Table state
+const sorting = ref<SortingState>([]);
+const columnFilters = ref<ColumnFiltersState>([]);
+const columnVisibility = ref<VisibilityState>({});
+const rowSelection = ref({});
 
-
-const sorting = ref<SortingState>([])
-const columnFilters = ref<ColumnFiltersState>([])
-const columnVisibility = ref<VisibilityState>({})
-const rowSelection = ref({})
-
+// Initialize table
 const table = useVueTable({
-    data,
+    data: data.value,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
-    onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
-    onColumnVisibilityChange: updaterOrValue => valueUpdater(updaterOrValue, columnVisibility),
-    onRowSelectionChange: updaterOrValue => valueUpdater(updaterOrValue, rowSelection),
+    onSortingChange: (updater) => valueUpdater(updater, sorting),
+    onColumnFiltersChange: (updater) => valueUpdater(updater, columnFilters),
+    onColumnVisibilityChange: (updater) => valueUpdater(updater, columnVisibility),
+    onRowSelectionChange: (updater) => valueUpdater(updater, rowSelection),
     state: {
-        get sorting() { return sorting.value },
-        get columnFilters() { return columnFilters.value },
-        get columnVisibility() { return columnVisibility.value },
-        get rowSelection() { return rowSelection.value },
+        get sorting() { return sorting.value; },
+        get columnFilters() { return columnFilters.value; },
+        get columnVisibility() { return columnVisibility.value; },
+        get rowSelection() { return rowSelection.value; },
     },
-})
+});
+
 
 // Computed property for visible columns
 const visibleColumns = computed(() => {
-    return table.getAllColumns().filter((column) => column.getCanHide())
-})
+    return table.getAllColumns().filter((column) => column.getCanHide());
+});
 
 // Function to toggle all columns visibility
 const toggleAllColumnsVisibility = (visible: boolean) => {
     table.getAllColumns().forEach((column) => {
         if (column.getCanHide()) {
-            column.toggleVisibility(visible)
+            column.toggleVisibility(visible);
         }
-    })
-}
+    });
+};
 
 // Computed property to check if all columns are hidden
 const areAllColumnsHidden = computed(() => {
-    return visibleColumns.value.every((column) => !column.getIsVisible())
-})
+    return visibleColumns.value.every((column) => !column.getIsVisible());
+});
 
 // Computed property for pagination text
 const paginationText = computed(() => {
-    const start = table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1
-    const end = Math.min(start + table.getState().pagination.pageSize - 1, table.getFilteredRowModel().rows.length)
-    return `Showing ${start} to ${end} of ${table.getFilteredRowModel().rows.length} rows`
-})
+    const start = table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1;
+    const end = Math.min(start + table.getState().pagination.pageSize - 1, table.getFilteredRowModel().rows.length);
+    return `Showing ${start} to ${end} of ${table.getFilteredRowModel().rows.length} rows`;
+});
 
 // Row quantity options
-const rowQuantityOptions = [10, 25, 50, 100, { label: 'All', value: -1 }]
+const rowQuantityOptions = [10, 25, 50, 100, { label: 'All', value: -1 }];
 
 // Function to update the number of rows per page
 const updateRowsPerPage = (value: number) => {
-    table.setPageSize(value === -1 ? table.getFilteredRowModel().rows.length : value)
-}
+    table.setPageSize(value === -1 ? table.getFilteredRowModel().rows.length : value);
+};
 </script>
 
 <template>
@@ -181,7 +191,7 @@ const updateRowsPerPage = (value: number) => {
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
                 <div class="w-full p-5">
                     <div class="flex gap-2 items-center py-4">
-                        <Input class="max-w-sm" placeholder="Filter emails..." :model-value="table.getColumn('email')?.getFilterValue() as string" @update:model-value="table.getColumn('email')?.setFilterValue($event)" />
+                        <Input class="max-w-sm" placeholder="Search emails..." :model-value="table.getColumn('email')?.getFilterValue() as string" @update:model-value="table.getColumn('email')?.setFilterValue($event)" />
                         <DropdownMenu>
                             <DropdownMenuTrigger as-child>
                                 <Button variant="outline" class="ml-auto">
@@ -228,21 +238,13 @@ const updateRowsPerPage = (value: number) => {
                                         </TableRow>
                                     </template>
                                     <template v-else>
-                                        <template v-for="row in table.getRowModel().rows" :key="row.id">
-                                            <TableRow :data-state="row.getIsSelected() && 'selected'">
-                                                <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                                                    <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-                                                </TableCell>
-                                            </TableRow>
-                                            <TableRow v-if="row.getIsExpanded()">
-                                                <TableCell :colspan="row.getAllCells().length">
-                                                    {{ JSON.stringify(row.original) }}
-                                                </TableCell>
-                                            </TableRow>
-                                        </template>
+                                        <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() && 'selected'">
+                                            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                                                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                                            </TableCell>
+                                        </TableRow>
                                     </template>
                                 </template>
-
                                 <TableRow v-else>
                                     <TableCell :colspan="columns.length" class="h-24 text-center">
                                         No results.

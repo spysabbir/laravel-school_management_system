@@ -4,45 +4,60 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the user's profile settings page.
-     */
     public function edit(Request $request): Response
     {
         return Inertia::render('settings/Profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => $request->session()->get('status'),
+            'currentUser' => $request->user(),
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Fill the user model with validated data
+        $user->fill($request->validated());
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            // Delete the old avatar if it exists
+            if ($user->avatar) {
+                $oldAvatarPath = public_path('uploads/avatars/') . $user->avatar;
+                if (file_exists($oldAvatarPath)) {
+                    unlink($oldAvatarPath);
+                }
+            }
+
+            // Generate a unique name for the new avatar
+            $avatarName = $user->id . '_avatar.' . $request->file('avatar')->getClientOriginalExtension();
+
+            // Resize and save the new avatar
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($request->file('avatar'));
+            $image->scale(width: 180, height: 180);
+            $image->toPng()->save(public_path('uploads/avatars/') . $avatarName);
+
+            // Update the user's avatar field
+            $user->avatar = $avatarName;
         }
 
-        $request->user()->save();
+        // Save the updated user data
+        $user->save();
 
-        return to_route('profile.edit');
+        // Redirect back with a success message
+        return to_route('profile.edit')->with('status', 'Profile updated successfully.');
     }
 
-    /**
-     * Delete the user's profile.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validate([
