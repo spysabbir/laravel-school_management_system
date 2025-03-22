@@ -9,26 +9,34 @@ use Illuminate\Routing\Controllers\Middleware;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
     {
         return [
-            new Middleware('index', only: ['index']),
-            new Middleware('index', only: ['index']),
+            // new Middleware('index', only: ['index']),
+            // new Middleware('index', only: ['index']),
         ];
     }
 
-    public function users()
+    public function index()
     {
         $users = User::all();
         return inertia('users/Index', ['users' => $users]);
     }
 
+    public function create()
+    {
+        $roles = Role::all();
+        return inertia('users/Create', ['roles' => $roles]);
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
+            'roles' => 'required',
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8',

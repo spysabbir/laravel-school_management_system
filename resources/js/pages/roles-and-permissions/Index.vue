@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage, useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { LoaderCircle } from 'lucide-vue-next';
+import InputError from '@/components/InputError.vue';
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { FlexRender, useVueTable, getCoreRowModel, getPaginationRowModel, getFilteredRowModel , getSortedRowModel } from '@tanstack/vue-table'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 import { toast } from 'vue-sonner'
 
@@ -18,43 +23,74 @@ import { valueUpdater } from '@/lib/utils'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Users',
-        href: '/users',
+        title: 'Roles And Permissions',
+        href: '/roles-and-permissions',
     },
 ];
 
-const isDialogOpen = ref(false);
+const page = usePage<PageProps>();
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    avatar: string;
-}
-const users = defineProps<{
-    users: User[];
-}>();
+const isDialogOpen = ref(false);
+const data = ref(page.props.roles);
+
+const form = useForm({
+    name: '',
+});
+
+const submit = () => {
+    form.post(route('role.store'), {
+        onSuccess: () => {
+            // Close the dialog
+            isDialogOpen.value = false;
+
+            // Reset the form
+            form.reset();
+
+            // Refresh the table data
+            data.value = page.props.roles;
+        },
+    });
+};
+
+const isProcessing = computed(() => form.processing);
 
 interface Flash {
     success?: null;
     error?: null;
 }
 
+interface Role {
+    id: string;
+    name: string;
+}
+
+interface Permission {
+    id: string;
+    name: string;
+}
+
+interface PageProps {
+    roles: Role[];
+    permissions: Permission[];
+    flash: Flash;
+}
+
 onMounted(() => {
-    watch(() => usePage<{ flash: Flash }>().props.flash,
+    watch(() => page.props.flash,
     (flash: Flash) => {
         if (flash.success) {
             toast.success(flash.success);
             flash.success = null;
         }
+        if (flash.error) {
+            toast.error(flash.error);
+            flash.error = null;
+        }
     }, { immediate: true });
 });
 
-// Reactive data
-const data = ref(users.users);
-
 // Table columns
-const columns: ColumnDef<User>[] = [
+const columns: ColumnDef<Role>[] = [
     {
         accessorKey: 'id',
         header: 'ID',
@@ -71,32 +107,12 @@ const columns: ColumnDef<User>[] = [
         cell: ({ row }) => h('div', row.getValue('name')),
     },
     {
-        accessorKey: 'email',
-        header: ({ column }) => {
-            return h(Button, {
-                variant: 'ghost',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-            }, () => ['Email', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]);
-        },
-        cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('email')),
-    },
-    {
-        accessorKey: 'avatar',
-        header: 'Avatar',
-        cell: ({ row }) => {
-            const avatarUrl = row.getValue('avatar');
-            return avatarUrl
-                ? h('img', { src: avatarUrl, alt: row.getValue('name'), class: 'h-8 w-8 rounded-full' })
-                : h('div', 'No Avatar');
-        },
-    },
-    {
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => {
             return h('div', { class: 'flex gap-2' }, [
                 // Edit button with icon using Link component
-                h(Link, { href: `/users/${row.getValue('id')}/edit`, class: 'btn btn-indigo-500 dark:bg-indigo-600 px-2 py-1 rounded' }, () => [
+                h(Link, { href: `/roles-and-permissions/${row.getValue('id')}/edit`, class: 'btn btn-indigo-500 dark:bg-indigo-600 px-2 py-1 rounded' }, () => [
                     h(Edit, { class: 'h-4 w-4' }),
                 ]),
                 // Delete button with icon using Button component
@@ -110,23 +126,24 @@ const columns: ColumnDef<User>[] = [
 
 // Handle delete action
 const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this user?')) {
-        const response = axios.delete(`/users/${id}`);
+    if (confirm('Are you sure you want to delete this role?')) {
+        const response = axios.delete(`/roles-and-permissions/${id}`);
         if (response.status === 204) {
-            toast.success('User deleted successfully.');
-            data.value = data.value.filter((user) => user.id !== id);
+            toast.success('Role deleted successfully.');
+            data.value = data.value.filter((role) => role.id !== id);
         } else {
-            toast.error('Failed to delete user.');
+            toast.error('Failed to delete role.');
         }
     }
 };
+
 // Table state
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 const rowSelection = ref({});
 
-// Initialize table
+// Initialize table with reactive data
 const table = useVueTable({
     data: data.value,
     columns,
@@ -182,14 +199,16 @@ const updateRowsPerPage = (value: number) => {
 </script>
 
 <template>
-    <Head title="Users" />
+    <Head title="Roles And Permissions" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <!-- Table and other content -->
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
                 <div class="w-full p-5">
                     <div class="flex gap-2 items-center py-4">
-                        <Input class="max-w-sm" placeholder="Search emails..." :model-value="table.getColumn('email')?.getFilterValue() as string" @update:model-value="table.getColumn('email')?.setFilterValue($event)" />
+                        <Input class="max-w-sm" placeholder="Search roles..." :model-value="table.getColumn('name')?.getFilterValue() as string" @update:model-value="table.getColumn('name')?.setFilterValue($event)" />
+                        
                         <DropdownMenu>
                             <DropdownMenuTrigger as-child>
                                 <Button variant="outline" class="ml-auto">
@@ -216,7 +235,35 @@ const updateRowsPerPage = (value: number) => {
                                 </DropdownMenuCheckboxItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                        <Link href="/users/create" class="btn btn-indigo-500 dark:bg-indigo-600 px-2 py-1 rounded">Create User</Link>
+                        
+                        <Dialog v-model:open="isDialogOpen">
+                            <DialogTrigger as-child>
+                                <Button variant="outline">Create Role</Button>
+                            </DialogTrigger>
+                            <DialogContent class="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Create Role</DialogTitle>
+                                    <DialogDescription>
+                                        Fill in the form below to create a new role.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form @submit.prevent="submit" class="flex flex-col gap-6">
+                                    <div class="grid gap-6">
+                                        <div class="grid gap-2">
+                                            <Label for="name">Role Name</Label>
+                                            <Input id="name" type="text" v-model="form.name" placeholder="Role name" />
+                                            <InputError :message="form.errors.name" />
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <Button type="submit" class="mt-2 w-full" :disabled="isProcessing">
+                                            <LoaderCircle v-if="isProcessing" class="h-4 w-4 animate-spin" />
+                                            Create
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                     <div class="rounded-md border">
                         <Table>

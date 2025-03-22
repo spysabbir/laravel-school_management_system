@@ -5,18 +5,20 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, useForm, Link } from '@inertiajs/vue3';
+import { Head, useForm, Link, usePage } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Create User',
-        href: '/users',
-    },
+    { title: 'Create User', href: '/users' },
 ];
 
+const page = usePage<PageProps>();
+const roles = ref(page.props.roles);
+
 const form = useForm({
+    roles: '',
     name: '',
     email: '',
     password: '',
@@ -33,7 +35,6 @@ const isProcessing = computed(() => form.processing);
 
 <template>
     <Head title="Create User" />
-
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex justify-end">
@@ -43,24 +44,41 @@ const isProcessing = computed(() => form.processing);
                 <form @submit.prevent="submit" class="flex flex-col gap-6">
                     <div class="grid gap-6">
                         <div class="grid gap-2">
+                            <Label for="role">Role</Label>
+                            <Select :modelValue="form.roles" @update:modelValue="(value) => form.roles = value" id="role" placeholder="Select a role">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem :value="role.name" v-for="role in roles" :key="role.id">
+                                            {{ role.name }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <InputError :message="form.errors.roles" />
+                        </div>
+
+                        <div class="grid gap-2">
                             <Label for="name">Name</Label>
-                            <Input id="name" type="text" autofocus :tabindex="2" autocomplete="name" v-model="form.name" placeholder="Full name" />
+                            <Input id="name" type="text" autofocus autocomplete="name" v-model="form.name" placeholder="Full name" />
                             <InputError :message="form.errors.name" />
                         </div>
 
                         <div class="grid gap-2">
                             <Label for="email">Email address</Label>
-                            <Input id="email" type="email" :tabindex="3" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
+                            <Input id="email" type="email" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
                             <InputError :message="form.errors.email" />
                         </div>
 
                         <div class="grid gap-2">
                             <Label for="password">Password</Label>
-                            <Input id="password" type="password" :tabindex="4" autocomplete="new-password" v-model="form.password" placeholder="Password" />
+                            <Input id="password" type="password" autocomplete="new-password" v-model="form.password" placeholder="Password" />
                             <InputError :message="form.errors.password" />
                         </div>
 
-                        <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="isProcessing">
+                        <Button type="submit" class="mt-2 w-full" :disabled="isProcessing">
                             <LoaderCircle v-if="isProcessing" class="h-4 w-4 animate-spin" />
                             Create account
                         </Button>

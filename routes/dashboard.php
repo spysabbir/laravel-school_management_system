@@ -11,19 +11,11 @@ use App\Http\Controllers\Dashboard\DashboardController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-});
 
+    Route::post('role.store', [RoleAndPermissionController::class,'roleStore'])->name('role.store');
+    Route::resource('roles-and-permissions', RoleAndPermissionController::class);
 
-Route::middleware('auth')->group(function () {
-    Route::get('roles-and-permissions', [RoleAndPermissionController::class, 'rolesAndPermissions'])->name('roles.and.permissions');
-
-    Route::get('users', [UserController::class, 'users'])->name('users');
-    Route::inertia('users/create', 'users/Create')->name('users.create');
-    Route::post('users', [UserController::class, 'store'])->name('users.store');
-    Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-
+    Route::resource('users', UserController::class);
 
     Route::redirect('settings', '/settings/profile');
 
