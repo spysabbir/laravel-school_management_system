@@ -5,17 +5,20 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, useForm, Link, usePage } from '@inertiajs/vue3';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { computed } from 'vue';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Dashboard', href: '/' },
+    { title: 'Users', href: '/users' },
     { title: 'Create User', href: '/users' },
 ];
 
-const page = usePage<PageProps>();
-const roles = ref(page.props.roles);
+const props = defineProps({
+    roles: { type: Array, required: true },
+});
 
 const form = useForm({
     roles: '',
@@ -26,6 +29,7 @@ const form = useForm({
 
 const submit = () => {
     form.post(route('users.store'), {
+        preserveScroll: true,
         onFinish: () => form.reset('password'),
     });
 };
@@ -50,11 +54,9 @@ const isProcessing = computed(() => form.processing);
                                     <SelectValue placeholder="Select a role" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem :value="role.name" v-for="role in roles" :key="role.id">
-                                            {{ role.name }}
-                                        </SelectItem>
-                                    </SelectGroup>
+                                    <SelectItem :value="role.name" v-for="role in roles" :key="role.id">
+                                        {{ role.name }}
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                             <InputError :message="form.errors.roles" />

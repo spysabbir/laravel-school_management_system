@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,9 +16,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from 'vue-sonner'
 
 import { ArrowUpDown, ChevronDown, Edit, Trash } from 'lucide-vue-next'
-import { h, ref, computed, onMounted, watch } from 'vue'
+import { h, ref, computed } from 'vue'
 
 import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/vue-table'
+
 import { valueUpdater } from '@/lib/utils'
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -28,10 +29,13 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const page = usePage<PageProps>();
-
 const isDialogOpen = ref(false);
-const data = ref(page.props.roles);
+const isProcessing = computed(() => form.processing);
+
+const props = defineProps({
+  roles: { type: Array, required: true },
+  permissions: { type: Array, required: true },
+});
 
 const form = useForm({
     name: '',
@@ -40,57 +44,15 @@ const form = useForm({
 const submit = () => {
     form.post(route('role.store'), {
         onSuccess: () => {
-            // Close the dialog
             isDialogOpen.value = false;
-
-            // Reset the form
+            toast.success('Role created successfully.');
             form.reset();
-
-            // Refresh the table data
-            data.value = page.props.roles;
         },
     });
 };
 
-const isProcessing = computed(() => form.processing);
-
-interface Flash {
-    success?: null;
-    error?: null;
-}
-
-interface Role {
-    id: string;
-    name: string;
-}
-
-interface Permission {
-    id: string;
-    name: string;
-}
-
-interface PageProps {
-    roles: Role[];
-    permissions: Permission[];
-    flash: Flash;
-}
-
-onMounted(() => {
-    watch(() => page.props.flash,
-    (flash: Flash) => {
-        if (flash.success) {
-            toast.success(flash.success);
-            flash.success = null;
-        }
-        if (flash.error) {
-            toast.error(flash.error);
-            flash.error = null;
-        }
-    }, { immediate: true });
-});
-
 // Table columns
-const columns: ColumnDef<Role>[] = [
+const columns = [
     {
         accessorKey: 'id',
         header: 'ID',
@@ -111,8 +73,12 @@ const columns: ColumnDef<Role>[] = [
         header: 'Actions',
         cell: ({ row }) => {
             return h('div', { class: 'flex gap-2' }, [
-                // Edit button with icon using Link component
-                h(Link, { href: `/roles-and-permissions/${row.getValue('id')}/edit`, class: 'btn btn-indigo-500 dark:bg-indigo-600 px-2 py-1 rounded' }, () => [
+                // Assign button with icon using Link component
+                h(Link, { href: `/roles-and-permissions/assign/${row.getValue('id')}`, class: 'btn btn-indigo-500 dark:bg-indigo-600 px-2 py-1 rounded' }, () => [
+                    h(Edit, { class: 'h-4 w-4' }),
+                ]),
+                // Revoke button with icon using Link component
+                h(Link, { href: `/roles-and-permissions/revoke/${row.getValue('id')}`, class: 'btn btn-yellow-500 dark:bg-yellow-600 px-2 py-1 rounded' }, () => [
                     h(Edit, { class: 'h-4 w-4' }),
                 ]),
                 // Delete button with icon using Button component
@@ -127,13 +93,7 @@ const columns: ColumnDef<Role>[] = [
 // Handle delete action
 const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this role?')) {
-        const response = axios.delete(`/roles-and-permissions/${id}`);
-        if (response.status === 204) {
-            toast.success('Role deleted successfully.');
-            data.value = data.value.filter((role) => role.id !== id);
-        } else {
-            toast.error('Failed to delete role.');
-        }
+        router.delete(route('role.destroy', { id }));
     }
 };
 
@@ -145,7 +105,7 @@ const rowSelection = ref({});
 
 // Initialize table with reactive data
 const table = useVueTable({
-    data: data.value,
+    data: props.roles,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -208,7 +168,7 @@ const updateRowsPerPage = (value: number) => {
                 <div class="w-full p-5">
                     <div class="flex gap-2 items-center py-4">
                         <Input class="max-w-sm" placeholder="Search roles..." :model-value="table.getColumn('name')?.getFilterValue() as string" @update:model-value="table.getColumn('name')?.setFilterValue($event)" />
-                        
+
                         <DropdownMenu>
                             <DropdownMenuTrigger as-child>
                                 <Button variant="outline" class="ml-auto">
@@ -235,7 +195,7 @@ const updateRowsPerPage = (value: number) => {
                                 </DropdownMenuCheckboxItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                        
+
                         <Dialog v-model:open="isDialogOpen">
                             <DialogTrigger as-child>
                                 <Button variant="outline">Create Role</Button>

@@ -1,60 +1,41 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { FlexRender, useVueTable, getCoreRowModel, getPaginationRowModel, getFilteredRowModel , getSortedRowModel } from '@tanstack/vue-table'
 
-import { toast } from 'vue-sonner'
-
 import { ArrowUpDown, ChevronDown, Edit, Trash } from 'lucide-vue-next'
-import { h, ref, computed, onMounted, watch } from 'vue'
+import { h, ref, computed } from 'vue'
 
-import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/vue-table'
+import type { ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/vue-table'
 import { valueUpdater } from '@/lib/utils'
 
 const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
     {
         title: 'Users',
         href: '/users',
     },
 ];
 
-const isDialogOpen = ref(false);
+// const isDialogOpen = ref(false);
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    avatar: string;
-}
-const users = defineProps<{
-    users: User[];
-}>();
-
-interface Flash {
-    success?: null;
-    error?: null;
-}
-
-onMounted(() => {
-    watch(() => usePage<{ flash: Flash }>().props.flash,
-    (flash: Flash) => {
-        if (flash.success) {
-            toast.success(flash.success);
-            flash.success = null;
-        }
-    }, { immediate: true });
+const props = defineProps({
+    users: {
+        type: Array,
+        required: true,
+    },
 });
 
-// Reactive data
-const data = ref(users.users);
-
 // Table columns
-const columns: ColumnDef<User>[] = [
+const columns = [
     {
         accessorKey: 'id',
         header: 'ID',
@@ -111,13 +92,8 @@ const columns: ColumnDef<User>[] = [
 // Handle delete action
 const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this user?')) {
-        const response = axios.delete(`/users/${id}`);
-        if (response.status === 204) {
-            toast.success('User deleted successfully.');
-            data.value = data.value.filter((user) => user.id !== id);
-        } else {
-            toast.error('Failed to delete user.');
-        }
+        router.delete(route('users.destroy', { id }));
+
     }
 };
 // Table state
@@ -128,7 +104,7 @@ const rowSelection = ref({});
 
 // Initialize table
 const table = useVueTable({
-    data: data.value,
+    data: props.users,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

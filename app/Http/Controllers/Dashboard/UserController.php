@@ -44,14 +44,17 @@ class UserController extends Controller implements HasMiddleware
 
         $data['password'] = Hash::make($request->password);
 
-        User::create($data);
+        $user = User::create($data);
 
-        return redirect()->route('users')->with('success', 'User created successfully.');
+        $user->assignRole($request->roles);
+
+        return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
     public function edit(User $user)
     {
-        return inertia('users/Edit', ['currentUser' => $user]);
+        $roles = Role::all();
+        return inertia('users/Edit', ['currentUser' => $user, 'roles' => $roles]);
     }
 
     public function update(Request $request, User $user)
@@ -63,6 +66,8 @@ class UserController extends Controller implements HasMiddleware
 
         $user->update($data);
 
-        return redirect()->route('users')->with('success', 'User updated successfully.');
+        $user->syncRoles($request->roles);
+
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 }

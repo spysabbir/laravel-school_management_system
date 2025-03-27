@@ -12,8 +12,12 @@ use App\Http\Controllers\Dashboard\DashboardController;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
-    Route::post('role.store', [RoleAndPermissionController::class,'roleStore'])->name('role.store');
-    Route::resource('roles-and-permissions', RoleAndPermissionController::class);
+    Route::get('roles-and-permissions', [RoleAndPermissionController::class,'index'])->name('roles-and-permissions');
+    Route::post('role-store', [RoleAndPermissionController::class,'roleStore'])->name('role.store');
+    Route::delete('role-destroy/{id}', [RoleAndPermissionController::class,'roleDestroy'])->name('role.destroy');
+    Route::get('roles-and-permissions/assign/{id}', [RoleAndPermissionController::class, 'assign'])->name('roles-and-permissions.assign');
+    Route::post('roles-and-permissions/assign/{id}', [RoleAndPermissionController::class, 'assignPermission'])->name('roles-and-permissions.assignPermission');
+    Route::delete('roles-and-permissions/revoke/{id}', [RoleAndPermissionController::class, 'revoke'])->name('roles-and-permissions.revoke');
 
     Route::resource('users', UserController::class);
 
