@@ -3,22 +3,25 @@ import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { type NavItem, type Auth } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { BookOpen, LayoutGrid, Lock, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import { computed } from 'vue';
-import { Auth } from '@/types';
 
 const auth = computed(() => usePage().props.auth as Auth);
 
-const hasPermission = (permission: string) => {
-    if (auth.value.role === 'Super Admin') {
+const hasPermission = (permission: string): boolean => {
+    if (auth.value.roles.includes('Super Admin')) {
         return true;
     }
 
-    return auth.value.hasPermission[permission] || false;
+    return auth.value.permissions.includes(permission);
 };
+
+// const hasAnyPermission = (...permissions: string[]): boolean => {
+//     return permissions.some(permission => hasPermission(permission));
+// };
 
 const mainNavItems = computed(() => {
     return [
@@ -28,27 +31,42 @@ const mainNavItems = computed(() => {
             icon: LayoutGrid,
             show: true,
         },
+        // {
+        //     title: 'User Management',
+        //     icon: Lock,
+        //     href: '#',
+        //     show: hasAnyPermission('user.view', 'user.create', 'user.edit', 'user.delete'),
+        //     childItems: [
+        //     {
+        //         title: 'User List',
+        //         href: '/users',
+        //         icon: Lock,
+        //         show: hasPermission('user.view'),
+        //     },
+        //     {
+        //         title: 'Create User',
+        //         href: '/users/create',
+        //         icon: Lock,
+        //         show: hasPermission('user.create'),
+        //     },
+        //     ].filter(item => item.show),
+        // },
         {
             title: 'Roles And Permissions',
-            href: '/roles-and-permissions',
-            icon: LayoutGrid,
+            href: '/roles-permissions',
+            icon: Lock,
             show: hasPermission('Read Roles And Permissions'),
         },
         {
             title: 'Users',
             href: '/users',
-            icon: LayoutGrid,
+            icon: Users,
             show: hasPermission('Read Users'),
         },
     ].filter(item => item.show);
 });
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
     {
         title: 'Documentation',
         href: 'https://laravel.com/docs/starter-kits',
@@ -72,7 +90,7 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <NavMain title="" :items="mainNavItems" />
         </SidebarContent>
 
         <SidebarFooter>

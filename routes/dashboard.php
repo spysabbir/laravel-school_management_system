@@ -1,36 +1,39 @@
 <?php
 
+use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\RoleAndPermissionController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\Dashboard\DashboardController;
 
-
+// Dashboard routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('roles-and-permissions', [RoleAndPermissionController::class,'index'])->name('roles-and-permissions');
-    Route::post('role-store', [RoleAndPermissionController::class,'roleStore'])->name('role.store');
-    Route::delete('role-destroy/{id}', [RoleAndPermissionController::class,'roleDestroy'])->name('role.destroy');
-    Route::get('roles-and-permissions/assign/{id}', [RoleAndPermissionController::class, 'assign'])->name('roles-and-permissions.assign');
-    Route::post('roles-and-permissions/assign/{id}', [RoleAndPermissionController::class, 'assignPermission'])->name('roles-and-permissions.assignPermission');
-    Route::delete('roles-and-permissions/revoke/{id}', [RoleAndPermissionController::class, 'revoke'])->name('roles-and-permissions.revoke');
+    Route::controller(RoleAndPermissionController::class)->group(function () {
+        Route::get('roles-permissions', 'index')->name('roles.permissions');
+
+        Route::get('roles-create', 'createRoles')->name('roles.create');
+        Route::post('roles-store', 'storeRoles')->name('roles.store');
+        Route::delete('roles-destroy/{id}', 'destroyRoles')->name('roles.destroy');
+
+        Route::get('roles-permissions-assign/{id}', 'assign')->name('roles.permissions.assign');
+        Route::put('roles-permissions-assign-store/{id}', 'assignStore')->name('roles.permissions.assign.store');
+        Route::get('roles-permissions-revoke/{id}', 'revoke')->name('roles.permissions.revoke');
+    });
 
     Route::resource('users', UserController::class);
 
-    Route::redirect('settings', '/settings/profile');
+    Route::redirect('account', 'profile/edit')->name('account.settings');
 
-    Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('profile/destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
-    Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
+    Route::get('password/edit', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::put('password/update', [PasswordController::class, 'update'])->name('password.update');
 
-    Route::get('settings/appearance', function () {
-        return Inertia::render('settings/Appearance');
-    })->name('appearance');
+    Route::get('appearance', [DashboardController::class, 'appearance'])->name('appearance');
 });

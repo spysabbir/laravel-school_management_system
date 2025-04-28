@@ -4,8 +4,8 @@ import type { Config } from 'ziggy-js';
 
 export interface Auth {
     user: User;
-    role: string;
-    hasPermission: Record<string, boolean>;
+    roles: string[];
+    permissions: string[];
 }
 
 export interface BreadcrumbItem {
@@ -18,6 +18,8 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon;
     isActive?: boolean;
+    childItems?: NavItem[];
+    show?: boolean;
 }
 
 export interface SharedData extends PageProps {
@@ -25,16 +27,36 @@ export interface SharedData extends PageProps {
     quote: { message: string; author: string };
     auth: Auth;
     ziggy: Config & { location: string };
+    sidebarOpen: boolean;
 }
 
 export interface User {
     id: number;
     name: string;
     email: string;
-    avatar?: string;
+    profile_photo?: string;
     email_verified_at: string | null;
+    created_at: string;
+    updated_at: string;
+    roles: Role[];
+    permissions: Permission[];
+}
+
+export type BreadcrumbItemType = BreadcrumbItem;
+
+export interface Role {
+    id: number;
+    name: string;
+    guard_name: string;
     created_at: string;
     updated_at: string;
 }
 
-export type BreadcrumbItemType = BreadcrumbItem;
+export interface Permission {
+    id: number;
+    group_name: string;
+    name: string;
+    guard_name: string;
+    created_at: string;
+    updated_at: string;
+}

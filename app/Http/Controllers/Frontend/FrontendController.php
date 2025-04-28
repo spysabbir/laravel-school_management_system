@@ -10,6 +10,6 @@ class FrontendController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Welcome');
+        return Inertia::render('frontend/Index');
     }
 }

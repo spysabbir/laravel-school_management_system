@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function dashboard()
     {
-        return Inertia::render('Dashboard');
+        return Inertia::render('dashboard/Dashboard');
     }
 
     public function appearance()

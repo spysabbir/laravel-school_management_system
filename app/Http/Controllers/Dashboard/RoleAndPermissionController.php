@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -15,61 +14,79 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            // new Middleware('index', only: ['index']),
-            // new Middleware('index', only: ['index']),
+            // 'auth',
+            // new Middleware('log', only: ['index']),
+            // new Middleware('subscribed', except: ['store']),
         ];
-    }
 
+    }
 
     public function index()
     {
         $roles = Role::all();
-        $permissions = Permission::all();
-        return Inertia::render('roles-and-permissions/Index', [
-            'roles' => $roles,
-            'permissions' => $permissions
-        ]);
+        return inertia('dashboard/roles-permissions/Index', compact('roles'));
     }
 
-    public function roleStore(Request $request)
+    public function createRoles()
+    {
+        return inertia('dashboard/roles-permissions/Create');
+    }
+
+    public function storeRoles(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:roles'
+            'name' => 'required|string|max:255|unique:roles,name',
         ]);
 
         Role::create(['name' => $request->name]);
 
-        return redirect()->route('roles-and-permissions')->with('success', 'Role created successfully.');
+        return redirect()->route('roles.permissions')->with('success', 'Role created successfully.');
     }
 
-    public function roleDestroy($id)
+    public function destroyRoles($id)
     {
-        $role = Role::findById($id);
+        $role = Role::findOrFail($id);
         $role->delete();
-        return redirect()->route('roles-and-permissions')->with('success', 'Role deleted successfully.');
+
+        return redirect()->route('roles.permissions')->with('success', 'Role deleted successfully.');
     }
 
     public function assign($id)
     {
-        $role = Role::findById($id);
-        $permissions = Permission::all();
-        return Inertia::render('roles-and-permissions/Assign', [
+        $role = Role::findOrFail($id);
+        $allPermissions = Permission::all();
+
+        $assignedPermissionIds = $role->getAllPermissions()->pluck('id');
+
+        return inertia('dashboard/roles-permissions/Assign', [
             'role' => $role,
-            'permissions' => $permissions
+            'permissions' => $allPermissions->toArray(),
+            // 'assignedPermissions' => $assignedPermissionIds,
+            'assignedPermissions' => $role->permissions->map(fn($permission) => ['id' => $permission->id]),
         ]);
     }
 
-    public function assignPermission(Request $request, $id)
+    public function assignStore(Request $request, $id)
     {
-        $role = Role::findById($id);
-        $role->givePermissionTo($request->permissions);
-        return redirect()->route('roles-and-permissions')->with('success', 'Permissions assigned successfully.');
+        $role = Role::findOrFail($id);
+
+        $request->validate([
+            'permission_ids' => 'required|array',
+            'permission_ids.*' => 'exists:permissions,id',
+        ]);
+
+        $role->permissions()->detach();
+        $role->permissions()->attach($request->permission_ids);
+
+        return redirect()->route('roles.permissions')->with('success', 'Permissions assigned successfully.');
     }
 
     public function revoke($id)
     {
-        $role = Role::findById($id);
-        $role->revokePermissionTo(Permission::all());
-        return redirect()->route('roles-and-permissions')->with('success', 'Permissions revoked successfully.');
+        $role = Role::findOrFail($id);
+        $role->permissions()->detach();
+
+        return redirect()->route('roles.permissions')->with('success', 'Permissions revoked successfully.');
     }
+
 }
