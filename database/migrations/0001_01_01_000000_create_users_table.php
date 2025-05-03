@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('blood_group', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])->nullable();
             $table->date('date_of_birth')->nullable();
             $table->enum('religion', ['Islam', 'Hinduism', 'Christianity', 'Buddhism', 'Other'])->nullable();
-            $table->enum('marital_status', ['Single', 'Married', 'Divorced', 'Widowed'])->nullable();
+            $table->enum('marital_status', ['Single', 'Married', 'Divorced', 'Widowed', 'Separated', 'Other'])->nullable();
             $table->string('phone')->nullable();
             $table->text('present_address')->nullable();
             $table->text('permanent_address')->nullable();

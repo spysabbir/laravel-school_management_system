@@ -3,8 +3,8 @@
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\RoleAndPermissionController;
 use App\Http\Controllers\Dashboard\UserController;
-use App\Http\Controllers\Settings\PasswordController;
-use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\AccountSettings\PasswordController;
+use App\Http\Controllers\AccountSettings\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

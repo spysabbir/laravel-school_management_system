@@ -21,7 +21,7 @@ const showAvatar = computed(() => props.user.profile_photo && props.user.profile
 
 <template>
     <Avatar class="h-8 w-8 overflow-hidden rounded-lg">
-        <AvatarImage v-if="showAvatar" :src="user.profile_photo" :alt="user.name" />
+        <AvatarImage v-if="showAvatar" :src="'/uploads/profile_photos/' + props.user.profile_photo" :alt="user.name" class="rounded-lg" />
         <AvatarFallback class="rounded-lg text-black dark:text-white">
             {{ getInitials(user.name) }}
         </AvatarFallback>

@@ -35,6 +35,14 @@ export interface User {
     name: string;
     email: string;
     profile_photo?: string;
+    gender: string | null;
+    phone: number | null;
+    blood_group: string | null;
+    date_of_birth: string | null;
+    religion: string | null;
+    marital_status: string | null;
+    present_address: string | null;
+    permanent_address: string | null;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
