@@ -3,7 +3,7 @@ import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem, type Auth } from '@/types';
+import { type Auth } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, LayoutGrid, Lock, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
@@ -19,9 +19,9 @@ const hasPermission = (permission: string): boolean => {
     return auth.value.permissions.includes(permission);
 };
 
-// const hasAnyPermission = (...permissions: string[]): boolean => {
-//     return permissions.some(permission => hasPermission(permission));
-// };
+const hasAnyPermission = (...permissions: string[]): boolean => {
+    return permissions.some(permission => hasPermission(permission));
+};
 
 const mainNavItems = computed(() => {
     return [
@@ -31,26 +31,6 @@ const mainNavItems = computed(() => {
             icon: LayoutGrid,
             show: true,
         },
-        // {
-        //     title: 'User Management',
-        //     icon: Lock,
-        //     href: '#',
-        //     show: hasAnyPermission('user.view', 'user.create', 'user.edit', 'user.delete'),
-        //     childItems: [
-        //     {
-        //         title: 'User List',
-        //         href: '/users',
-        //         icon: Lock,
-        //         show: hasPermission('user.view'),
-        //     },
-        //     {
-        //         title: 'Create User',
-        //         href: '/users/create',
-        //         icon: Lock,
-        //         show: hasPermission('user.create'),
-        //     },
-        //     ].filter(item => item.show),
-        // },
         {
             title: 'Roles And Permissions',
             href: '/roles-permissions',
@@ -66,13 +46,42 @@ const mainNavItems = computed(() => {
     ].filter(item => item.show);
 });
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
-];
+const footerNavItems = computed(() => {
+    return [
+        {
+            title: 'Settings',
+            icon: BookOpen,
+            href: '#',
+            show: hasAnyPermission('settings.general', 'settings.mail', 'settings.sms', 'settings.payment'),
+            childItems: [
+                {
+                    title: 'General Settings',
+                    href: '/settings/general',
+                    icon: Lock,
+                    show: hasPermission('settings.general'),
+                },
+                {
+                    title: 'Mail Settings',
+                    href: '/settings/mail',
+                    icon: Lock,
+                    show: hasPermission('settings.mail'),
+                },
+                {
+                    title: 'SMS Settings',
+                    href: '/settings/sms',
+                    icon: Lock,
+                    show: hasPermission('settings.sms'),
+                },
+                {
+                    title: 'Payment Settings',
+                    href: '/settings/payment',
+                    icon: Lock,
+                    show: hasPermission('settings.payment'),
+                },
+            ],
+        },
+    ].filter(item => item.show);
+});
 </script>
 
 <template>
@@ -90,11 +99,11 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain title="" :items="mainNavItems" />
+            <NavMain title="Main" :items="mainNavItems" />
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
+            <NavFooter title="" :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>

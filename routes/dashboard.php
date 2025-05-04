@@ -3,8 +3,9 @@
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\RoleAndPermissionController;
 use App\Http\Controllers\Dashboard\UserController;
-use App\Http\Controllers\AccountSettings\PasswordController;
-use App\Http\Controllers\AccountSettings\ProfileController;
+use App\Http\Controllers\Account\PasswordController;
+use App\Http\Controllers\Account\ProfileController;
+use App\Http\Controllers\Dashboard\SettingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,7 +27,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('users', UserController::class);
 
-    Route::redirect('account', 'profile/edit')->name('account.settings');
+    Route::get('setting-general', [SettingController::class, 'settingGeneral'])->name('setting.general');
+    Route::get('setting-mail', [SettingController::class, 'settingMail'])->name('setting.mail');
+    Route::get('setting-sms', [SettingController::class, 'settingSms'])->name('setting.sms');
+    Route::get('setting-payment', [SettingController::class, 'settingPayment'])->name('setting.payment');
+
+    Route::redirect('account', 'profile/edit')->name('account');
 
     Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('profile/update', [ProfileController::class, 'update'])->name('profile.update');
