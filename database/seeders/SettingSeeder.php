@@ -42,7 +42,6 @@ class SettingSeeder extends Seeder
         // SmsSetting
         SmsSetting::create([
             'sms_driver' => 'twilio',
-            'sms_api_url' => 'https://api.twilio.com/2010-04-01/Accounts/your_account_sid/Messages.json',
             'sms_api_key' => 'your_api_key',
             'sms_api_secret' => 'your_api_secret',
             'sms_from_number' => '+1234567890',

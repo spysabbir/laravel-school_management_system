@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('sms_settings', function (Blueprint $table) {
             $table->id();
             $table->string('sms_driver')->default('twilio');
-            $table->string('sms_api_url')->default('https://api.twilio.com/2010-04-01/Accounts/your_account_sid/Messages.json');
             $table->string('sms_api_key')->default('your_api_key');
             $table->string('sms_api_secret')->default('your_api_secret');
             $table->string('sms_from_number')->default('your_twilio_number');

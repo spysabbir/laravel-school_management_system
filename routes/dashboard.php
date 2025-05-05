@@ -3,11 +3,10 @@
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\RoleAndPermissionController;
 use App\Http\Controllers\Dashboard\UserController;
-use App\Http\Controllers\Account\PasswordController;
-use App\Http\Controllers\Account\ProfileController;
+use App\Http\Controllers\Dashboard\Account\PasswordController;
+use App\Http\Controllers\Dashboard\Account\ProfileController;
 use App\Http\Controllers\Dashboard\SettingController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Dashboard routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -27,10 +26,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('users', UserController::class);
 
-    Route::get('setting-general', [SettingController::class, 'settingGeneral'])->name('setting.general');
-    Route::get('setting-mail', [SettingController::class, 'settingMail'])->name('setting.mail');
-    Route::get('setting-sms', [SettingController::class, 'settingSms'])->name('setting.sms');
-    Route::get('setting-payment', [SettingController::class, 'settingPayment'])->name('setting.payment');
+    Route::get('setting/general', [SettingController::class, 'generalSetting'])->name('general.setting');
+    Route::post('setting/general/update', [SettingController::class, 'updateGeneral'])->name('general.setting.update');
+    Route::get('setting/mail', [SettingController::class, 'mailSetting'])->name('mail.setting');
+    Route::post('setting/mail/update', [SettingController::class, 'updateMail'])->name('mail.setting.update');
+    Route::get('setting/sms', [SettingController::class, 'smsSetting'])->name('sms.setting');
+    Route::post('setting/sms/update', [SettingController::class, 'updateSms'])->name('sms.setting.update');
+    Route::get('setting/payment', [SettingController::class, 'paymentSetting'])->name('payment.setting');
+    Route::post('setting/payment/update', [SettingController::class, 'updatePayment'])->name('payment.setting.update');
 
     Route::redirect('account', 'profile/edit')->name('account');
 

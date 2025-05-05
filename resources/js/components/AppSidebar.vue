@@ -27,19 +27,19 @@ const mainNavItems = computed(() => {
     return [
         {
             title: 'Dashboard',
-            href: '/dashboard',
+            href: route('dashboard'),
             icon: LayoutGrid,
             show: true,
         },
         {
             title: 'Roles And Permissions',
-            href: '/roles-permissions',
+            href: route('roles.permissions'),
             icon: Lock,
             show: hasPermission('Read Roles And Permissions'),
         },
         {
             title: 'Users',
-            href: '/users',
+            href: route('users.index'),
             icon: Users,
             show: hasPermission('Read Users'),
         },
@@ -49,34 +49,34 @@ const mainNavItems = computed(() => {
 const footerNavItems = computed(() => {
     return [
         {
-            title: 'Settings',
+            title: 'Setting',
             icon: BookOpen,
             href: '#',
-            show: hasAnyPermission('settings.general', 'settings.mail', 'settings.sms', 'settings.payment'),
+            show: hasAnyPermission('setting.general', 'setting.mail', 'setting.sms', 'setting.payment'),
             childItems: [
                 {
-                    title: 'General Settings',
-                    href: '/settings/general',
+                    title: 'General Setting',
+                    href: route('general.setting'),
                     icon: Lock,
-                    show: hasPermission('settings.general'),
+                    show: hasPermission('setting.general'),
                 },
                 {
-                    title: 'Mail Settings',
-                    href: '/settings/mail',
+                    title: 'Mail Setting',
+                    href: route('mail.setting'),
                     icon: Lock,
-                    show: hasPermission('settings.mail'),
+                    show: hasPermission('setting.mail'),
                 },
                 {
-                    title: 'SMS Settings',
-                    href: '/settings/sms',
+                    title: 'SMS Setting',
+                    href: route('sms.setting'),
                     icon: Lock,
-                    show: hasPermission('settings.sms'),
+                    show: hasPermission('setting.sms'),
                 },
                 {
-                    title: 'Payment Settings',
-                    href: '/settings/payment',
+                    title: 'Payment Setting',
+                    href: route('payment.setting'),
                     icon: Lock,
-                    show: hasPermission('settings.payment'),
+                    show: hasPermission('setting.payment'),
                 },
             ],
         },
@@ -103,7 +103,7 @@ const footerNavItems = computed(() => {
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter title="" :items="footerNavItems" />
+            <NavFooter title="App" :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
