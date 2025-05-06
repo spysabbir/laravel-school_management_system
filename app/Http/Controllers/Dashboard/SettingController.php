@@ -9,6 +9,9 @@ use App\Models\PaymentSetting;
 use App\Models\SmsSetting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Http\Response;
 
 class SettingController extends Controller
 {
@@ -21,35 +24,59 @@ class SettingController extends Controller
         ]);
     }
 
-    public function updateGeneral(Request $request)
+    public function updateGeneral(Request $request): Response|\Illuminate\Http\RedirectResponse
     {
         $request->validate([
-            'site_name' => 'required|string|max:255',
-            'site_url' => 'required|url|max:255',
-            'site_email' => 'required|email|max:255',
-            'site_phone' => 'required|string|max:255',
-            'site_address' => 'required|string|max:255',
-            'site_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'site_favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'site_timezone' => 'required|string|max:255',
+            'app_name' => 'required|string|max:255',
+            'app_url' => 'required|url|max:255',
+            'app_email' => 'required|email|max:255',
+            'app_phone' => 'required|string|max:255',
+            'app_address' => 'required|string|max:255',
+            'app_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'app_favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'app_timezone' => 'required|string|max:255',
         ]);
 
         $generalSetting = GeneralSetting::first();
-        $data = $request->except(['site_logo', 'site_favicon']);
+        $data = $request->except(['app_logo', 'app_favicon']);
 
-        // Handle logo upload
-        if ($request->hasFile('site_logo')) {
-            $data['site_logo'] = $request->file('site_logo')->store('settings', 'public');
+        // Handle logo
+        if ($request->hasFile('app_logo')) {
+            if ($generalSetting->app_logo) {
+                $oldLogo = public_path('uploads/setting_photos/') . $generalSetting->app_logo;
+                if (file_exists($oldLogo)) unlink($oldLogo);
+            }
+            $extension = $request->file('app_logo')->getClientOriginalExtension();
+            $filename = 'app_logo.' . $extension;
+
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($request->file('app_logo'));
+            $image->scale(width: 180, height: 180);
+            $image->toPng()->save(public_path('uploads/setting_photos/') . $filename);
+
+            $data['app_logo'] = $filename;
         }
 
-        // Handle favicon upload
-        if ($request->hasFile('site_favicon')) {
-            $data['site_favicon'] = $request->file('site_favicon')->store('settings', 'public');
+        // Handle favicon
+        if ($request->hasFile('app_favicon')) {
+            if ($generalSetting->app_favicon) {
+                $oldFavicon = public_path('uploads/settings_photos/') . $generalSetting->app_favicon;
+                if (file_exists($oldFavicon)) unlink($oldFavicon);
+            }
+            $extension = $request->file('app_favicon')->getClientOriginalExtension();
+            $filename = 'app_favicon.' . $extension;
+
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($request->file('app_favicon'));
+            $image->scale(width: 16, height: 16);
+            $image->toPng()->save(public_path('uploads/settings_photos/') . $filename);
+
+            $data['app_favicon'] = $filename;
         }
 
         $generalSetting->update($data);
 
-        return redirect()->back()->with('success', 'Settings updated successfully.');
+        return redirect()->route('general.setting')->with('success', 'Settings updated successfully.');
     }
 
     public function mailSetting()

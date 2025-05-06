@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LoaderCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -55,8 +56,9 @@ const handleFaviconFile = (event: Event) => {
 
 const submit = () => {
     form.post(route('general.setting.update'), {
-        onSuccess: () => {
-            form.reset();
+        forceFormData: true,
+        onFinish: () => {
+            form.reset('app_logo', 'app_favicon');
         },
     });
 };
@@ -66,8 +68,6 @@ const submit = () => {
     <Head title="General Setting" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-    {{ props.generalSetting.app_name }}
-
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
                 <form @submit.prevent="submit" class="flex h-full flex-col items-center justify-center gap-4 p-4">
@@ -111,10 +111,18 @@ const submit = () => {
                         </div>
                         <div class="grid gap-2">
                             <Label for="app_timezone">App Timezone</Label>
-                            <select id="app_timezone" v-model="form.app_timezone" class="rounded-md border border-gray-300 p-2">
-                                <option value="UTC">UTC</option>
-                                <!-- Add more timezone options as needed -->
-                            </select>
+                            <Select v-model="form.app_timezone">
+                                <SelectTrigger class="w-full">
+                                    <SelectValue placeholder="Select timezone" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Timezone</SelectLabel>
+                                        <SelectItem value="UTC">UTC</SelectItem>
+                                        <SelectItem value="Asia/Dhaka">Asia/Dhaka</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
                             <InputError :message="form.errors.app_timezone" />
                         </div>
                         <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
