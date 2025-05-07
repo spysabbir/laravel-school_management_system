@@ -8,121 +8,75 @@ import { Label } from '@/components/ui/label';
 import { LoaderCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'vue-sonner'
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'General Setting',
-        href: '/setting/general',
+        title: 'Payment Setting',
+        href: '/setting/payment',
     },
 ];
 
 const props = defineProps<{
-    generalSetting: {
-        app_name?: string;
-        app_url?: string;
-        app_email?: string;
-        app_phone?: string;
-        app_address?: string;
-        app_logo?: string;
-        app_favicon?: string;
-        app_timezone?: string;
+    paymentSetting: {
+        payment_gateway?: string;
+        payment_api_key?: string;
+        payment_api_secret?: string;
     };
 }>();
 
 const form = useForm({
-    app_name: props.generalSetting?.app_name || '',
-    app_url: props.generalSetting?.app_url || '',
-    app_email: props.generalSetting?.app_email || '',
-    app_phone: props.generalSetting?.app_phone || '',
-    app_address: props.generalSetting?.app_address || '',
-    app_logo: null as File | null,
-    app_favicon: null as File | null,
-    app_timezone: props.generalSetting?.app_timezone || 'UTC',
+    payment_gateway: props.paymentSetting?.payment_gateway || '',
+    payment_api_key: props.paymentSetting?.payment_api_key || '',
+    payment_api_secret: props.paymentSetting?.payment_api_secret || '',
 });
 
-const handleFile = (event: Event) => {
-    const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files.length > 0) {
-        form.app_logo = fileInput.files[0];
-    }
-};
-
-const handleFaviconFile = (event: Event) => {
-    const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files.length > 0) {
-        form.app_favicon = fileInput.files[0];
-    }
-};
-
 const submit = () => {
-    form.post(route('general.setting.update'), {
+    form.post(route('payment.setting.update'), {
         onSuccess: () => {
-            form.reset();
+            toast.success('Payment settings updated successfully', {
+                description: new Date().toLocaleString()
+            })
         },
     });
 };
 </script>
 
 <template>
-    <Head title="General Setting" />
+    <Head title="Payment Setting" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
                 <form @submit.prevent="submit" class="flex h-full flex-col items-center justify-center gap-4 p-4">
-                    <h1 class="text-2xl font-bold">General Settings</h1>
+                    <h1 class="text-2xl font-bold">Payment Settings</h1>
                     <div class="grid gap-6">
-                        <div class="grid gap-2">
-                            <Label for="app_name">App Name</Label>
-                            <Input id="app_name" type="text" v-model="form.app_name" placeholder="App Name" />
-                            <InputError :message="form.errors.app_name" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="app_url">App URL</Label>
-                            <Input id="app_url" type="text" v-model="form.app_url" placeholder="App URL" />
-                            <InputError :message="form.errors.app_url" />
-                        </div>
-                        <div class="grid gap-2">
-                            <Label for="app_email">App Email</Label>
-                            <Input id="app_email" type="email" v-model="form.app_email" placeholder="App Email" />
-                            <InputError :message="form.errors.app_email" />
-                        </div>
-                        <div class="grid gap-2">
-                            <Label for="app_phone">App Phone</Label>
-                            <Input id="app_phone" type="text" v-model="form.app_phone" placeholder="App Phone" />
-                            <InputError :message="form.errors.app_phone" />
-                        </div>
-                        <div class="grid gap-2">
-                            <Label for="app_address">App Address</Label>
-                            <Input id="app_address" type="text" v-model="form.app_address" placeholder="App Address" />
-                            <InputError :message="form.errors.app_address" />
-                        </div>
-                        <div class="grid gap-2">
-                            <Label for="app_logo">App Logo</Label>
-                            <Input id="app_logo" type="file" @change="handleFile" />
-                            <InputError :message="form.errors.app_logo" />
-                        </div>
-                        <div class="grid gap-2">
-                            <Label for="app_favicon">App Favicon</Label>
-                            <Input id="app_favicon" type="file" @change="handleFaviconFile" />
-                            <InputError :message="form.errors.app_favicon" />
-                        </div>
-                        <div class="grid gap-2">
-                            <Label for="app_timezone">App Timezone</Label>
-                            <Select v-model="form.app_timezone">
-                                <SelectTrigger class="w-full">
-                                    <SelectValue placeholder="Select timezone" />
+                        <div class="grid w-full max-w-sm items-center gap-1.5">
+                            <Label for="payment_gateway" class="text-sm font-medium">Payment Gateway</Label>
+                            <Select id="payment_gateway" v-model="form.payment_gateway" class="w-full">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Payment Gateway" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Timezone</SelectLabel>
-                                        <SelectItem value="UTC">UTC</SelectItem>
-                                        <SelectItem value="Asia/Dhaka">Asia/Dhaka</SelectItem>
+                                        <SelectLabel>Payment Gateways</SelectLabel>
+                                        <SelectItem value="stripe">Stripe</SelectItem>
+                                        <SelectItem value="paypal">PayPal</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <InputError :message="form.errors.app_timezone" />
+                            <InputError :message="form.errors.payment_gateway" class="mt-2" />
+                        </div>
+                        <div class="grid w-full max-w-sm items-center gap-1.5">
+                            <Label for="payment_api_key" class="text-sm font-medium">API Key</Label>
+                            <Input id="payment_api_key" type="text" v-model="form.payment_api_key" placeholder="API Key" />
+                            <InputError :message="form.errors.payment_api_key" class="mt-2" />
+                        </div>
+                        <div class="grid w-full max-w-sm items-center gap-1.5">
+                            <Label for="payment_api_secret" class="text-sm font-medium">API Secret</Label>
+                            <Input id="payment_api_secret" type="text" v-model="form.payment_api_secret" placeholder="API Secret" />
+                            <InputError :message="form.errors.payment_api_secret" class="mt-2" />
                         </div>
                         <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                             <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />

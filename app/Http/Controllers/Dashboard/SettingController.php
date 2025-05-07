@@ -60,7 +60,7 @@ class SettingController extends Controller
         // Handle favicon
         if ($request->hasFile('app_favicon')) {
             if ($generalSetting->app_favicon) {
-                $oldFavicon = public_path('uploads/settings_photos/') . $generalSetting->app_favicon;
+                $oldFavicon = public_path('uploads/setting_photos/') . $generalSetting->app_favicon;
                 if (file_exists($oldFavicon)) unlink($oldFavicon);
             }
             $extension = $request->file('app_favicon')->getClientOriginalExtension();
@@ -69,7 +69,7 @@ class SettingController extends Controller
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('app_favicon'));
             $image->scale(width: 16, height: 16);
-            $image->toPng()->save(public_path('uploads/settings_photos/') . $filename);
+            $image->toPng()->save(public_path('uploads/setting_photos/') . $filename);
 
             $data['app_favicon'] = $filename;
         }
@@ -118,7 +118,7 @@ class SettingController extends Controller
     public function updateSms(Request $request)
     {
         $request->validate([
-            'sms_provider' => 'required|string|max:255',
+            'sms_driver' => 'required|string|max:255',
             'sms_api_key' => 'required|string|max:255',
             'sms_api_secret' => 'required|string|max:255',
             'sms_from_number' => 'required|string|max:255',

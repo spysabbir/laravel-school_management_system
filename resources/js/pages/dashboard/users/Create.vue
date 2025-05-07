@@ -9,6 +9,7 @@ import { LoaderCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { List } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,6 +33,9 @@ const submit = () => {
     form.post(route('users.store'), {
         onSuccess: () => {
             form.reset();
+            toast.success('User created successfully', {
+                description: new Date().toLocaleString(),
+            });
         },
     });
 };

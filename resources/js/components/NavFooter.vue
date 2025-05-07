@@ -5,18 +5,15 @@ import { ChevronRight } from 'lucide-vue-next'
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 
-withDefaults(defineProps<{
+defineProps<{
     title: string;
     items: NavItem[];
-}>(), {
-    title: 'Menu',
-    items: [],
-});
+}>();
 
 const page = usePage<SharedData>();
 
 const hasActiveChild = (item: NavItem) => {
-    return item.childItems?.some(child => child.href === page.url) || false;
+    return item.childItems?.some(child => child.href.replace(/^(http|https):\/\/[^/]+/, '') === page.url) || false;
 };
 </script>
 
@@ -28,7 +25,7 @@ const hasActiveChild = (item: NavItem) => {
                 <Collapsible v-if="item.childItems && item.childItems.length" as-child :default-open="item.isActive || hasActiveChild(item)" class="group/collapsible">
                     <SidebarMenuItem>
                         <CollapsibleTrigger as-child>
-                            <SidebarMenuButton :tooltip="item.title" :is-active="item.href === page.url || hasActiveChild(item)">
+                            <SidebarMenuButton :tooltip="item.title" :is-active="item.href.replace(/^(http|https):\/\/[^/]+/, '') === page.url || hasActiveChild(item)">
                                 <component :is="item.icon" v-if="item.icon" />
                                 <span>{{ item.title }}</span>
                                 <ChevronRight class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -37,7 +34,7 @@ const hasActiveChild = (item: NavItem) => {
                         <CollapsibleContent>
                             <SidebarMenuSub>
                                 <SidebarMenuSubItem v-for="subItem in item.childItems" :key="subItem.title">
-                                    <SidebarMenuSubButton as-child :is-active="subItem.href === page.url">
+                                    <SidebarMenuSubButton as-child :is-active="subItem.href.replace(/^(http|https):\/\/[^/]+/, '') === page.url">
                                         <Link :href="subItem.href">
                                             <component :is="subItem.icon" v-if="subItem.icon" class="w-4 h-4 mr-2" />
                                             <span>{{ subItem.title }}</span>
@@ -50,7 +47,7 @@ const hasActiveChild = (item: NavItem) => {
                 </Collapsible>
 
                 <SidebarMenuItem v-else>
-                    <SidebarMenuButton as-child :is-active="item.href === page.url" :tooltip="item.title">
+                    <SidebarMenuButton as-child :is-active="item.href.replace(/^(http|https):\/\/[^/]+/, '') === page.url" :tooltip="item.title">
                         <Link :href="item.href">
                             <component :is="item.icon" v-if="item.icon" />
                             <span>{{ item.title }}</span>

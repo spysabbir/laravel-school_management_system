@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem, type Role } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Edit, Plus, Trash } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
 
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
@@ -21,6 +22,12 @@ const confirmDelete = (roleId: number) => {
     if (confirm('Are you sure you want to delete this role?')) {
         router.delete(route('roles.destroy', roleId), {
             preserveScroll: true,
+            onSuccess: () => {
+                router.reload();
+                toast.success('Role deleted successfully', {
+                    description: new Date().toLocaleString(),
+                });
+            },
         });
     }
 };

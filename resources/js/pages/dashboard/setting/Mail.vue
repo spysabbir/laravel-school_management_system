@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { LoaderCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'vue-sonner'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -39,7 +40,13 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('mail.setting.update'));
+    form.post(route('mail.setting.update'), {
+        onSuccess: () => {
+            toast.success('Mail settings updated successfully', {
+                description: new Date().toLocaleString()
+            })
+        },
+    });
 };
 </script>
 

@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { DateFormatter, getLocalTimeZone, parseDate, today, isSameDay } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
 import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'vue-sonner'
 
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading } from '@/components/ui/calendar'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -44,23 +45,23 @@ const df = new DateFormatter('en-US', {
 });
 
 const calendarProps = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(), {
-  modelValue: undefined,
-  placeholder() {
-    return today(getLocalTimeZone())
-  },
-  weekdayFormat: 'short',
+    modelValue: undefined,
+    placeholder() {
+        return today(getLocalTimeZone())
+    },
+    weekdayFormat: 'short',
 });
 
 const calendarEmits = defineEmits<CalendarRootEmits>();
 
 const delegatedProps = computed(() => {
-  const { class: _, placeholder: __, ...delegated } = calendarProps;
-  return delegated;
+    const { class: _, placeholder: __, ...delegated } = calendarProps;
+    return delegated;
 });
 
 const dateValue = useVModel(calendarProps, 'modelValue', calendarEmits, {
-  passive: true,
-  defaultValue: today(getLocalTimeZone()),
+    passive: true,
+    defaultValue: today(getLocalTimeZone()),
 });
 
 const forwarded = useForwardPropsEmits(delegatedProps, calendarEmits);
@@ -141,7 +142,7 @@ const submit = () => {
         preserveScroll: true,
         onSuccess: () => {
             if (newProfilePhotoPreviewUrl.value) {
-                 URL.revokeObjectURL(newProfilePhotoPreviewUrl.value);
+                URL.revokeObjectURL(newProfilePhotoPreviewUrl.value);
             }
             newProfilePhotoPreviewUrl.value = null;
             newProfilePhotoFile.value = null;
@@ -150,6 +151,11 @@ const submit = () => {
             if (fileInput) {
                 fileInput.value = '';
             }
+
+            toast.success('Profile updated successfully', {
+                description: new Date().toLocaleString(),
+            });
+            existingProfilePhotoUrl.value = form.profile_photo ? `/uploads/profile_photos/${form.profile_photo}` : null;
         },
     });
 };
@@ -180,13 +186,13 @@ const submit = () => {
                                 class="w-20 h-20 rounded-full object-cover"
                                 alt="New Profile Photo Preview"
                             />
-                             <img
+                            <img
                                 v-else-if="existingProfilePhotoUrl"
                                 :src="existingProfilePhotoUrl"
                                 class="w-20 h-20 rounded-full object-cover"
                                 alt="Current Profile Photo"
                             />
-                             <div v-else class="w-20 h-20 rounded-full bg-neutral-200 flex items-center justify-center text-neutral-500">
+                            <div v-else class="w-20 h-20 rounded-full bg-neutral-200 flex items-center justify-center text-neutral-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                                 </svg>
@@ -278,9 +284,9 @@ const submit = () => {
                                                         if (newDate.compare(today(getLocalTimeZone())) > 0) {
                                                             newDate = today(getLocalTimeZone());
                                                         }
-                                                         dateValue = newDate;
+                                                        dateValue = newDate;
                                                     } catch (e) {
-                                                         dateValue = dateValue.set({ month: Number(v) });
+                                                        dateValue = dateValue.set({ month: Number(v) });
                                                     }
                                                 }"
                                             >
@@ -300,16 +306,16 @@ const submit = () => {
 
                                             <Select
                                                 :model-value="dateValue?.year.toString()"
-                                                 @update:model-value="(v) => {
+                                                @update:model-value="(v) => {
                                                     if (!v || !dateValue) return;
                                                     try {
                                                         let newDate = dateValue.set({ year: Number(v) });
-                                                         if (newDate.compare(today(getLocalTimeZone())) > 0) {
+                                                        if (newDate.compare(today(getLocalTimeZone())) > 0) {
                                                             newDate = today(getLocalTimeZone());
                                                         }
                                                         dateValue = newDate;
                                                     } catch (e) {
-                                                         dateValue = dateValue.set({ year: Number(v) });
+                                                        dateValue = dateValue.set({ year: Number(v) });
                                                     }
                                                 }"
                                             >
@@ -345,7 +351,7 @@ const submit = () => {
                                                         v-for="weekDate in weekDates"
                                                         :key="weekDate.toString()"
                                                         :date="weekDate"
-                                                         :is-disabled="weekDate.compare(today(getLocalTimeZone())) > 0" >
+                                                        :is-disabled="weekDate.compare(today(getLocalTimeZone())) > 0" >
                                                         <CalendarCellTrigger
                                                             :day="weekDate"
                                                             :month="month.value"

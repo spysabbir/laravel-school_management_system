@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { List, LoaderCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
+import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,6 +23,11 @@ const form = useForm({
 const submit = () => {
     form.post(route('roles.store'), {
         onFinish: () => form.reset(),
+        onSuccess: () => {
+            toast.success('Role created successfully', {
+                description: new Date().toLocaleString(),
+            });
+        },
     });
 };
 

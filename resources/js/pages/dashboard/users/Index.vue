@@ -4,6 +4,7 @@ import { type BreadcrumbItem, type User } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Plus, Trash, Edit } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,6 +21,12 @@ const confirmDelete = (userId: number) => {
     if (confirm('Are you sure you want to delete this user?')) {
         router.delete(route('users.destroy', userId), {
             preserveScroll: true,
+            onSuccess: () => {
+                router.reload();
+                toast.success('User deleted successfully', {
+                    description: new Date().toLocaleString(),
+                });
+            },
         });
     }
 };

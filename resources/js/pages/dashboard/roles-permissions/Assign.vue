@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -42,7 +43,9 @@ const groupedPermissions = computed(() => {
 const submit = () => {
     form.put(route('roles.permissions.assign.store', props.role.id), {
         onSuccess: () => {
-            form.reset();
+            toast.success('Permissions assigned successfully', {
+                description: new Date().toLocaleString(),
+            });
         },
     });
 };

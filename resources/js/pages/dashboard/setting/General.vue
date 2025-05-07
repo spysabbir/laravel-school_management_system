@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { LoaderCircle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'vue-sonner'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -59,6 +60,11 @@ const submit = () => {
         forceFormData: true,
         onFinish: () => {
             form.reset('app_logo', 'app_favicon');
+        },
+        onSuccess: () => {
+            toast.success('General settings updated successfully', {
+                description: new Date().toLocaleString()
+            })
         },
     });
 };
