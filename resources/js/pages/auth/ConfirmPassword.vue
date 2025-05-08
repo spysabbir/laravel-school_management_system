@@ -28,16 +28,7 @@ const submit = () => {
             <div class="space-y-6">
                 <div class="grid gap-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        class="mt-1 block w-full"
-                        v-model="form.password"
-                        required
-                        autocomplete="current-password"
-                        autofocus
-                    />
-
+                    <Input id="password" type="password" class="mt-1 block w-full" v-model="form.password" autocomplete="current-password" autofocus />
                     <InputError :message="form.errors.password" />
                 </div>
 

@@ -15,6 +15,6 @@ class DashboardController extends Controller
 
     public function appearance()
     {
-        return Inertia::render('account-settings/Appearance');
+        return Inertia::render('dashboard/account/Appearance');
     }
 }

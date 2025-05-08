@@ -6,7 +6,7 @@ import HeadingSmall from '@/components/HeadingSmall.vue';
 import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/AppLayout.vue';
-import SettingsLayout from '@/layouts/account-settings/Layout.vue';
+import SettingsLayout from '@/layouts/account/Layout.vue';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {

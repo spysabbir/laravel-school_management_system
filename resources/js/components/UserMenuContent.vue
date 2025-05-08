@@ -3,7 +3,7 @@ import UserInfo from '@/components/UserInfo.vue';
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import type { User } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Users } from 'lucide-vue-next';
+import { LogOut, UserCog } from 'lucide-vue-next';
 
 interface Props {
     user: User;
@@ -26,7 +26,7 @@ defineProps<Props>();
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full" :href="route('account')" prefetch as="button">
-                <Users class="mr-2 h-4 w-4" />
+                <UserCog class="mr-2 h-4 w-4" />
                 Account Settings
             </Link>
         </DropdownMenuItem>

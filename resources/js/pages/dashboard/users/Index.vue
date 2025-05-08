@@ -47,15 +47,17 @@ const confirmDelete = (userId: number) => {
                     <TableCaption>A list of your users</TableCaption>
                     <TableHeader>
                         <TableRow>
+                            <TableHead>ID</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Email</TableHead>
-                            <TableHead>Role</TableHead>
+                            <TableHead>Roles</TableHead>
                             <TableHead>Created At</TableHead>
                             <TableHead>Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         <TableRow v-for="(user, index) in users" :key="index">
+                            <TableCell>{{ user.id }}</TableCell>
                             <TableCell>{{ user.name }}</TableCell>
                             <TableCell>{{ user.email }}</TableCell>
                             <TableCell>

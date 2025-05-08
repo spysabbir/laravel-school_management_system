@@ -16,10 +16,7 @@ class ProfileController extends Controller
 {
     public function edit(Request $request): Response
     {
-        return Inertia::render('dashboard/account/Profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => $request->session()->get('status'),
-        ]);
+        return Inertia::render('dashboard/account/Profile');
     }
 
     public function update(Request $request): RedirectResponse
@@ -39,10 +36,6 @@ class ProfileController extends Controller
             'present_address' => ['nullable', 'string', 'max:500'],
             'permanent_address' => ['nullable', 'string', 'max:500'],
         ]);
-
-        if ($request->has('email') && $user->email !== $validated['email']) {
-            $validated['email_verified_at'] = null;
-        }
 
         if ($request->hasFile('profile_photo')) {
             // Delete old profile photo if exists
@@ -71,9 +64,6 @@ class ProfileController extends Controller
         return redirect()->route('profile.edit')->with('success', 'Profile updated successfully');
     }
 
-    /**
-     * Delete the user's profile.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validate([

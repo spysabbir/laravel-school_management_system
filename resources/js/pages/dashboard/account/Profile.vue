@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { cn } from '@/lib/utils'
 import DeleteUser from '@/components/DeleteUser.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
-import SettingsLayout from '@/layouts/account-settings/Layout.vue';
+import SettingsLayout from '@/layouts/account/Layout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -172,31 +172,15 @@ const submit = () => {
                 <form @submit.prevent="submit" class="space-y-6">
                     <div class="grid gap-2">
                         <Label for="profile_photo">Profile Photo</Label>
-                        <Input
-                            id="profile_photo"
-                            type="file"
-                            class="mt-1 block w-full"
-                            @change="onProfilePhotoChange"
-                            accept="image/*"
-                        />
+                        <Input id="profile_photo" type="file" class="mt-1 block w-full" @change="onProfilePhotoChange" accept="image/*" />
                         <div class="flex space-x-2">
-                            <img
-                                v-if="newProfilePhotoPreviewUrl"
-                                :src="newProfilePhotoPreviewUrl"
-                                class="w-20 h-20 rounded-full object-cover"
-                                alt="New Profile Photo Preview"
-                            />
-                            <img
-                                v-else-if="existingProfilePhotoUrl"
-                                :src="existingProfilePhotoUrl"
-                                class="w-20 h-20 rounded-full object-cover"
-                                alt="Current Profile Photo"
-                            />
+                            <img v-if="existingProfilePhotoUrl" :src="existingProfilePhotoUrl" class="w-20 h-20 rounded-full object-cover" alt="Current Profile Photo" />
                             <div v-else class="w-20 h-20 rounded-full bg-neutral-200 flex items-center justify-center text-neutral-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                                 </svg>
                             </div>
+                            <img v-if="newProfilePhotoPreviewUrl" :src="newProfilePhotoPreviewUrl" class="w-20 h-20 rounded-full object-cover" alt="New Profile Photo Preview" />
                         </div>
                         <InputError class="mt-2" :message="form.errors.profile_photo" />
                     </div>
@@ -424,23 +408,6 @@ const submit = () => {
                         <Label for="permanent_address">Permanent Address</Label>
                         <Textarea v-model="form.permanent_address" placeholder="Enter your permanent address" />
                         <InputError class="mt-2" :message="form.errors.permanent_address" />
-                    </div>
-
-                    <div v-if="mustVerifyEmail && !user.email_verified_at">
-                        <p class="-mt-4 text-sm text-muted-foreground">
-                            Your email address is unverified.
-                            <Link
-                                :href="route('verification.send')" method="post"
-                                as="button"
-                                class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                            >
-                                Click here to resend the verification email.
-                            </Link>
-                        </p>
-
-                        <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
-                            A new verification link has been sent to your email address.
-                        </div>
                     </div>
 
                     <div class="flex items-center gap-4">

@@ -2,7 +2,7 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem, type Role } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Edit, Plus, Trash } from 'lucide-vue-next';
+import { FolderSync, Plus, CopyX, Trash } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -66,9 +66,9 @@ const confirmRevoke = (roleId: number) => {
                             <TableCell>{{ index+1 }}</TableCell>
                             <TableCell>{{ role.name }}</TableCell>
                             <TableCell class="flex items-center gap-2">
-                                <Link :href="route('roles.permissions.assign', role.id)" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-200"><Edit class="h-5 w-5" /></Link>
+                                <Link :href="route('roles.permissions.assign', role.id)" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-200"><FolderSync class="h-5 w-5" /></Link>
+                                <button @click="confirmRevoke(role.id)" class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200"><CopyX class="h-5 w-5"/></button>
                                 <button @click="confirmDelete(role.id)" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200"><Trash class="h-5 w-5" /></button>
-                                <button @click="confirmRevoke(role.id)" class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200"><Trash class="h-5 w-5" /></button>
                             </TableCell>
                         </TableRow>
                     </TableBody>

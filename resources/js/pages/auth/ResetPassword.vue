@@ -44,30 +44,13 @@ const submit = () => {
 
                 <div class="grid gap-2">
                     <Label for="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        name="password"
-                        autocomplete="new-password"
-                        v-model="form.password"
-                        class="mt-1 block w-full"
-                        autofocus
-                        placeholder="Password"
-                    />
+                    <Input id="password" type="password" name="password" autocomplete="new-password" v-model="form.password" class="mt-1 block w-full" autofocus placeholder="Password" />
                     <InputError :message="form.errors.password" />
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="password_confirmation"> Confirm Password </Label>
-                    <Input
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        autocomplete="new-password"
-                        v-model="form.password_confirmation"
-                        class="mt-1 block w-full"
-                        placeholder="Confirm password"
-                    />
+                    <Input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" v-model="form.password_confirmation" class="mt-1 block w-full" placeholder="Confirm password" />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>
 

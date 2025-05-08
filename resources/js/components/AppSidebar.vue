@@ -5,7 +5,7 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type Auth } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, LayoutGrid, Lock, Users } from 'lucide-vue-next';
+import { Settings, AppWindow, MailCheck, MessageSquareMore, CreditCard, LayoutGrid, Lock, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import { computed } from 'vue';
 
@@ -50,32 +50,32 @@ const footerNavItems = computed(() => {
     return [
         {
             title: 'Setting',
-            icon: BookOpen,
+            icon: Settings,
             href: '#',
             show: hasAnyPermission('setting.general', 'setting.mail', 'setting.sms', 'setting.payment'),
             childItems: [
                 {
                     title: 'General Setting',
                     href: route('general.setting'),
-                    icon: Lock,
+                    icon: AppWindow,
                     show: hasPermission('setting.general'),
                 },
                 {
                     title: 'Mail Setting',
                     href: route('mail.setting'),
-                    icon: Lock,
+                    icon: MailCheck,
                     show: hasPermission('setting.mail'),
                 },
                 {
                     title: 'SMS Setting',
                     href: route('sms.setting'),
-                    icon: Lock,
+                    icon: MessageSquareMore,
                     show: hasPermission('setting.sms'),
                 },
                 {
                     title: 'Payment Setting',
                     href: route('payment.setting'),
-                    icon: Lock,
+                    icon: CreditCard,
                     show: hasPermission('setting.payment'),
                 },
             ],
