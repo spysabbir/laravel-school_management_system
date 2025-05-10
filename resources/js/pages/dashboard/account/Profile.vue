@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { cn } from '@/lib/utils'
 import DeleteUser from '@/components/DeleteUser.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
@@ -25,15 +24,20 @@ import { CalendarRoot, type CalendarRootEmits, type CalendarRootProps, useDateFo
 import { createDecade, createYear, toDate } from 'reka-ui/date'
 import { type HTMLAttributes } from 'vue'
 
+type Gender = 'Male' | 'Female' | 'Other' | null;
+type BloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | null;
+type Religion = 'Islam' | 'Hinduism' | 'Christianity' | 'Buddhism' | 'Other' | null;
+type MaritalStatus = 'Single' | 'Married' | 'Divorced' | 'Widowed' | 'Separated' | 'Other' | null;
+
 interface ProfileForm {
     profile_photo: File | null;
     name: string;
     email: string;
-    gender: string | null;
+    gender: Gender;
     date_of_birth: string | null;
-    blood_group: string | null;
-    religion: string | null;
-    marital_status: string | null;
+    blood_group: BloodGroup;
+    religion: Religion;
+    marital_status: MaritalStatus;
     phone: string | null;
     present_address: string | null;
     permanent_address: string | null;
@@ -46,9 +50,7 @@ const df = new DateFormatter('en-US', {
 
 const calendarProps = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(), {
     modelValue: undefined,
-    placeholder() {
-        return today(getLocalTimeZone())
-    },
+    placeholder: () => today(getLocalTimeZone()),
     weekdayFormat: 'short',
 });
 
@@ -67,6 +69,7 @@ const dateValue = useVModel(calendarProps, 'modelValue', calendarEmits, {
 const forwarded = useForwardPropsEmits(delegatedProps, calendarEmits);
 const formatter = useDateFormatter('en');
 
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile settings',
@@ -77,36 +80,38 @@ const breadcrumbs: BreadcrumbItem[] = [
 const page = usePage<SharedData>();
 const user = page.props.auth.user as User;
 
-const existingProfilePhotoUrl = ref<string | null>(user.profile_photo ? `/uploads/profile_photos/${user.profile_photo}` : null);
+const existingProfilePhotoUrl = ref<string | null>(
+    user.profile_photo ? `/uploads/profile_photos/${user.profile_photo}` : null
+);
 const newProfilePhotoFile = ref<File | null>(null);
 const newProfilePhotoPreviewUrl = ref<string | null>(null);
 
-watch(newProfilePhotoFile, (newFile, oldFile) => {
-    if (oldFile && newProfilePhotoPreviewUrl.value) {
+const clearPhotoPreview = () => {
+    if (newProfilePhotoPreviewUrl.value) {
         URL.revokeObjectURL(newProfilePhotoPreviewUrl.value);
         newProfilePhotoPreviewUrl.value = null;
     }
+};
 
-    if (newFile) {
-        newProfilePhotoPreviewUrl.value = URL.createObjectURL(newFile);
+const onProfilePhotoChange = (e: Event) => {
+    clearPhotoPreview();
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0] || null;
+    newProfilePhotoFile.value = file;
+    if (file) {
+        newProfilePhotoPreviewUrl.value = URL.createObjectURL(file);
     }
-}, { immediate: false });
-
-onUnmounted(() => {
-    if (newProfilePhotoPreviewUrl.value) {
-        URL.revokeObjectURL(newProfilePhotoPreviewUrl.value);
-    }
-});
+};
 
 const form = useForm<ProfileForm>({
     profile_photo: null,
     name: user.name,
     email: user.email,
-    gender: user.gender,
+    gender: user.gender as Gender,
     date_of_birth: user.date_of_birth,
-    blood_group: user.blood_group,
-    religion: user.religion,
-    marital_status: user.marital_status,
+    blood_group: user.blood_group as BloodGroup,
+    religion: user.religion as Religion,
+    marital_status: user.marital_status as MaritalStatus,
     phone: user.phone,
     present_address: user.present_address,
     permanent_address: user.permanent_address,
@@ -114,48 +119,38 @@ const form = useForm<ProfileForm>({
 });
 
 onMounted(() => {
-    if (user.date_of_birth) {
-        try {
-            dateValue.value = parseDate(user.date_of_birth, getLocalTimeZone());
-        } catch (e) {
-            console.error("Failed to parse user's date of birth:", user.date_of_birth, e);
-            dateValue.value = today(getLocalTimeZone());
-        }
-    } else {
-        dateValue.value = today(getLocalTimeZone());
-    }
+    dateValue.value = user.date_of_birth
+        ? parseDate(user.date_of_birth)
+        : today(getLocalTimeZone());
 });
 
-
-const onProfilePhotoChange = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    const file = target.files?.[0];
-    newProfilePhotoFile.value = file || null;
-};
+onUnmounted(() => {
+    clearPhotoPreview();
+});
 
 const submit = () => {
-    form.date_of_birth = dateValue.value ? dateValue.value.toString() : null;
-
+    form.date_of_birth = dateValue.value?.toString() || null;
     form.profile_photo = newProfilePhotoFile.value;
 
     form.post(route('profile.update'), {
         preserveScroll: true,
         onSuccess: () => {
-            if (newProfilePhotoPreviewUrl.value) {
-                URL.revokeObjectURL(newProfilePhotoPreviewUrl.value);
-            }
-            newProfilePhotoPreviewUrl.value = null;
+            clearPhotoPreview();
             newProfilePhotoFile.value = null;
 
             const fileInput = document.getElementById('profile_photo') as HTMLInputElement;
-            if (fileInput) {
-                fileInput.value = '';
-            }
+            if (fileInput) fileInput.value = '';
 
             toast.success('Profile updated successfully', {
                 description: new Date().toLocaleString(),
             });
-            existingProfilePhotoUrl.value = form.profile_photo ? `/uploads/profile_photos/${form.profile_photo}` : null;
+
+            // If the backend returns updated `user.profile_photo`, use it. Otherwise use preview.
+            if (newProfilePhotoPreviewUrl.value) {
+                existingProfilePhotoUrl.value = newProfilePhotoPreviewUrl.value;
+            }
+
+            newProfilePhotoFile.value = null;
         },
     });
 };
@@ -242,25 +237,16 @@ const submit = () => {
                         <Label for="date_of_birth">Date Of Birth</Label>
                         <Popover>
                             <PopoverTrigger as-child>
-                                <Button
-                                    variant="outline"
-                                    :class="cn('w-full justify-start text-left font-normal', !dateValue && 'text-muted-foreground')"
-                                >
+                                <Button variant="outline" class="w-full justify-start text-left font-normal">
                                     <CalendarIcon class="mr-2 h-4 w-4" />
                                     {{ dateValue ? df.format(dateValue.toDate(getLocalTimeZone())) : "Pick a date" }}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent class="w-auto p-0">
-                                <CalendarRoot
-                                    v-slot="{ date, grid, weekDays }"
-                                    v-model="dateValue"
-                                    v-bind="forwarded"
-                                    class="rounded-md border p-3"
-                                    :max-value="today(getLocalTimeZone())" >
+                                <CalendarRoot v-slot="{ date, grid, weekDays }" v-model="dateValue" v-bind="forwarded" class="rounded-md border p-3" :max-value="today(getLocalTimeZone())" >
                                     <CalendarHeader>
                                         <CalendarHeading class="flex w-full items-center justify-between gap-2">
-                                            <Select
-                                                :model-value="dateValue?.month.toString()"
+                                            <Select :model-value="dateValue?.month.toString()"
                                                 @update:model-value="(v) => {
                                                     if (!v || !dateValue) return;
                                                     try {
@@ -278,18 +264,13 @@ const submit = () => {
                                                     <SelectValue placeholder="Select month" />
                                                 </SelectTrigger>
                                                 <SelectContent class="max-h-[200px]">
-                                                    <SelectItem
-                                                        v-for="month in createYear({ dateObj: date })"
-                                                        :key="month.toString()"
-                                                        :value="month.month.toString()"
-                                                    >
-                                                    {{ formatter.custom(toDate(month), { month: 'long' }) }}
+                                                    <SelectItem v-for="month in createYear({ dateObj: date })" :key="month.toString()" :value="month.month.toString()" >
+                                                        {{ formatter.custom(toDate(month), { month: 'long' }) }}
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
 
-                                            <Select
-                                                :model-value="dateValue?.year.toString()"
+                                            <Select :model-value="dateValue?.year.toString()"
                                                 @update:model-value="(v) => {
                                                     if (!v || !dateValue) return;
                                                     try {
@@ -307,10 +288,7 @@ const submit = () => {
                                                     <SelectValue placeholder="Select year" />
                                                 </SelectTrigger>
                                                 <SelectContent class="max-h-[200px]">
-                                                    <SelectItem
-                                                        v-for="yearValue in createDecade({ dateObj: date, startIndex: -100, endIndex: 0 })" :key="yearValue.toString()"
-                                                        :value="yearValue.year.toString()"
-                                                    >
+                                                    <SelectItem v-for="yearValue in createDecade({ dateObj: date, startIndex: -100, endIndex: 0 })" :key="yearValue.toString()" :value="yearValue.year.toString()">
                                                         {{ yearValue.year }}
                                                     </SelectItem>
                                                 </SelectContent>
@@ -322,24 +300,15 @@ const submit = () => {
                                         <CalendarGrid v-for="month in grid" :key="month.value.toString()">
                                             <CalendarGridHead>
                                                 <CalendarGridRow>
-                                                    <CalendarHeadCell
-                                                        v-for="day in weekDays" :key="day"
-                                                    >
+                                                    <CalendarHeadCell v-for="day in weekDays" :key="day">
                                                         {{ day }}
                                                     </CalendarHeadCell>
                                                 </CalendarGridRow>
                                             </CalendarGridHead>
                                             <CalendarGridBody class="grid">
                                                 <CalendarGridRow v-for="(weekDates, index) in month.rows" :key="`weekDate-${index}`" class="mt-2 w-full">
-                                                    <CalendarCell
-                                                        v-for="weekDate in weekDates"
-                                                        :key="weekDate.toString()"
-                                                        :date="weekDate"
-                                                        :is-disabled="weekDate.compare(today(getLocalTimeZone())) > 0" >
-                                                        <CalendarCellTrigger
-                                                            :day="weekDate"
-                                                            :month="month.value"
-                                                            :is-selected="dateValue ? isSameDay(weekDate, dateValue) : false" />
+                                                    <CalendarCell v-for="weekDate in weekDates" :key="weekDate.toString()" :date="weekDate" :is-disabled="weekDate.compare(today(getLocalTimeZone())) > 0" >
+                                                        <CalendarCellTrigger :day="weekDate" :month="month.value" :is-selected="dateValue ? isSameDay(weekDate, dateValue) : false" />
                                                     </CalendarCell>
                                                 </CalendarGridRow>
                                             </CalendarGridBody>
