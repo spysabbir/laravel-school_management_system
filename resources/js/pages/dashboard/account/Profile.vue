@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
-import SettingsLayout from '@/layouts/account/Layout.vue';
+import AccountLayout from '@/layouts/account/Layout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { DateFormatter, getLocalTimeZone, parseDate, today, isSameDay } from '@internationalized/date'
@@ -129,15 +129,12 @@ onUnmounted(() => {
 });
 
 const submit = () => {
-    form.date_of_birth = dateValue.value?.toString() || null;
+    form.date_of_birth = dateValue.value ? dateValue.value.toString() : null;
     form.profile_photo = newProfilePhotoFile.value;
 
     form.post(route('profile.update'), {
         preserveScroll: true,
         onSuccess: () => {
-            clearPhotoPreview();
-            newProfilePhotoFile.value = null;
-
             const fileInput = document.getElementById('profile_photo') as HTMLInputElement;
             if (fileInput) fileInput.value = '';
 
@@ -145,12 +142,11 @@ const submit = () => {
                 description: new Date().toLocaleString(),
             });
 
-            // If the backend returns updated `user.profile_photo`, use it. Otherwise use preview.
             if (newProfilePhotoPreviewUrl.value) {
                 existingProfilePhotoUrl.value = newProfilePhotoPreviewUrl.value;
+                newProfilePhotoPreviewUrl.value = null;
+                newProfilePhotoFile.value = null;
             }
-
-            newProfilePhotoFile.value = null;
         },
     });
 };
@@ -160,7 +156,7 @@ const submit = () => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Profile settings" />
 
-        <SettingsLayout>
+        <AccountLayout>
             <div class="flex flex-col space-y-6">
                 <HeadingSmall title="Profile information" description="Update your name and email address and other details" />
 
@@ -182,13 +178,13 @@ const submit = () => {
 
                     <div class="grid gap-2">
                         <Label for="name">Name</Label>
-                        <Input id="name" class="mt-1 block w-full" v-model="form.name" required placeholder="Full name" />
+                        <Input id="name" class="mt-1 block w-full" v-model="form.name" placeholder="Full name" />
                         <InputError class="mt-2" :message="form.errors.name" />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="email">Email address</Label>
-                        <Input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required placeholder="Email address" />
+                        <Input id="email" type="email" class="mt-1 block w-full" v-model="form.email" placeholder="Email address" />
                         <InputError class="mt-2" :message="form.errors.email" />
                     </div>
 
@@ -386,6 +382,6 @@ const submit = () => {
             </div>
 
             <DeleteUser />
-        </SettingsLayout>
+        </AccountLayout>
     </AppLayout>
 </template>
