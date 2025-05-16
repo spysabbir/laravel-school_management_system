@@ -43,6 +43,58 @@ const mainNavItems = computed(() => {
             icon: Users,
             show: hasPermission('Read Users'),
         },
+        {
+            title: 'Setup',
+            icon: Settings,
+            href: '#',
+            show: hasAnyPermission('setting.general', 'setting.mail', 'setting.sms', 'setting.payment'),
+            childItems: [
+                {
+                    title: 'Class',
+                    href: route('classes.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Class'),
+                },
+                {
+                    title: 'Shift',
+                    href: route('shifts.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Shift'),
+                },
+                {
+                    title: 'Year',
+                    href: route('years.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Year'),
+                },
+                {
+                    title: 'Group',
+                    href: route('groups.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Group'),
+                },
+            ],
+        },
+        {
+            title: 'Expense',
+            icon: Settings,
+            href: '#',
+            show: hasAnyPermission('setting.general', 'setting.mail', 'setting.sms', 'setting.payment'),
+            childItems: [
+                {
+                    title: 'Expense Category',
+                    href: route('expense.categories.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Expense Category'),
+                },
+                {
+                    title: 'Expense',
+                    href: route('expenses.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Expense'),
+                }
+            ],
+        },
     ].filter(item => item.show);
 });
 

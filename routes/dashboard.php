@@ -6,6 +6,16 @@ use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\Account\PasswordController;
 use App\Http\Controllers\Dashboard\Account\ProfileController;
 use App\Http\Controllers\Dashboard\SettingController;
+use App\Http\Controllers\Dashboard\ClassController;
+use App\Http\Controllers\Dashboard\ExamController;
+use App\Http\Controllers\Dashboard\ExpenseCategoryController;
+use App\Http\Controllers\Dashboard\ExpenseController;
+use App\Http\Controllers\Dashboard\ShiftController;
+use App\Http\Controllers\Dashboard\YearController;
+use App\Http\Controllers\Dashboard\GroupController;
+use App\Http\Controllers\Dashboard\StudentController;
+use App\Http\Controllers\Dashboard\SubjectController;
+use App\Http\Controllers\Dashboard\TeacherController;
 use Illuminate\Support\Facades\Route;
 
 // Dashboard routes
@@ -25,6 +35,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::resource('users', UserController::class);
+
+    Route::resource('classes', ClassController::class)->except(['show']);
+    Route::resource('shifts', ShiftController::class)->except(['show']);
+    Route::resource('years', YearController::class)->except(['show']);
+    Route::resource('groups', GroupController::class)->except(['show']);
+
+    Route::resource('expense.categories', ExpenseCategoryController::class)->except(['show']);
+    Route::resource('expenses', ExpenseController::class)->except(['show']);
+    Route::resource('students', StudentController::class)->except(['show']);
+    Route::resource('teachers', TeacherController::class)->except(['show']);
+    Route::resource('subjects', SubjectController::class)->except(['show']);
+    Route::resource('exams', ExamController::class)->except(['show']);
 
     Route::get('setting/general', [SettingController::class, 'generalSetting'])->name('general.setting');
     Route::post('setting/general/update', [SettingController::class, 'updateGeneral'])->name('general.setting.update');

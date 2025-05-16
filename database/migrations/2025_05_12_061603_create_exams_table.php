@@ -13,17 +13,13 @@ return new class extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
-            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade');
             $table->string('name');
-            $table->date('exam_date');
-            $table->time('start_time');
-            $table->time('end_time');
-            $table->string('status')->default('active');
-            $table->string('type')->default('internal');
-            $table->string('description')->nullable();
-            $table->string('marks')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

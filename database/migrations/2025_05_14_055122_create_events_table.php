@@ -17,9 +17,12 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->date('start_date');
             $table->date('end_date');
-            $table->string('status')->default('active');
-            $table->string('type')->default('general');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

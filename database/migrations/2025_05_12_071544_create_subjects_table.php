@@ -14,13 +14,16 @@ return new class extends Migration
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
             $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
-            $table->foreignId('section_id')->constrained('sections')->onDelete('cascade');
+            $table->foreignId('group_id')->constrained('groups')->onDelete('cascade');
             $table->enum('type', ['Compulsory', 'Optional'])->default('Compulsory');
             $table->string('name');
-            $table->string('code')->unique();
-            $table->string('description')->nullable();
-            $table->string('status')->default('active');
+            $table->string('code');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

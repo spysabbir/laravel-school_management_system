@@ -14,22 +14,16 @@ return new class extends Migration
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('expense_category_id')->constrained('expense_categories')->onDelete('cascade');
-            $table->string('name');
+            $table->string('title');
             $table->longText('description')->nullable();
             $table->float('amount')->default(0);
             $table->date('date');
-            $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
-            $table->string('payment_method')->default('cash');
-            $table->string('transaction_id')->nullable();
-            $table->string('receipt')->nullable();
-            $table->string('notes')->nullable();
-            $table->string('created_by')->nullable();
-            $table->string('updated_by')->nullable();
-            $table->string('deleted_by')->nullable();
-            $table->string('approved_by')->nullable();
-            $table->string('approved_at')->nullable();
-            $table->string('rejected_by')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

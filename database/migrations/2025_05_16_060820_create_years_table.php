@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('students', function (Blueprint $table) {
+        Schema::create('years', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
-            $table->foreignId('shift_id')->constrained('shifts')->onDelete('cascade');
-            $table->foreignId('group_id')->constrained('groups')->onDelete('cascade');
+            $table->string('name')->unique();
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('students');
+        Schema::dropIfExists('years');
     }
 };
