@@ -41,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('years', YearController::class)->except(['show']);
     Route::resource('groups', GroupController::class)->except(['show']);
 
-    Route::resource('expense.categories', ExpenseCategoryController::class)->except(['show']);
+    Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show']);
     Route::resource('expenses', ExpenseController::class)->except(['show']);
     Route::resource('students', StudentController::class)->except(['show']);
     Route::resource('teachers', TeacherController::class)->except(['show']);

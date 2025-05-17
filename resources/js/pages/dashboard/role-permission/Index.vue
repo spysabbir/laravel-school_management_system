@@ -9,7 +9,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Roles And Permissions',
+        title: 'Role And Permission',
         href: '/roles-permissions',
     },
 ];
@@ -42,7 +42,7 @@ const confirmRevoke = (roleId: number) => {
 </script>
 
 <template>
-    <Head title="Roles And Permissions" />
+    <Head title="Role And Permission" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">

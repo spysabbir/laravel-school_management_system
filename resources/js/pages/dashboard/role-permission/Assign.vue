@@ -14,7 +14,7 @@ import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Roles Permissions Assign',
+        title: 'Role Permission Assign',
         href: '/roles-permissions-assign',
     },
 ];

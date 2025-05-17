@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        return Inertia::render('dashboard/users/Index', [
+        return Inertia::render('dashboard/user/Index', [
             'users' => User::with('roles')->get(),
         ]);
     }
@@ -20,7 +20,7 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return Inertia::render('dashboard/users/Create', [
+        return Inertia::render('dashboard/user/Create', [
             'roles' => $roles,
         ]);
     }
@@ -45,7 +45,7 @@ class UserController extends Controller
     {
         $roles = Role::all();
 
-        return Inertia::render('dashboard/users/Edit', [
+        return Inertia::render('dashboard/user/Edit', [
             'user' => $user,
             'roles' => $roles,
             'userRoles' => $user->roles->map(fn($role) => ['id' => $role->id]),

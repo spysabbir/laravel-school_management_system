@@ -32,22 +32,22 @@ const mainNavItems = computed(() => {
             show: true,
         },
         {
-            title: 'Roles And Permissions',
+            title: 'Role And Permission',
             href: route('roles.permissions'),
             icon: Lock,
-            show: hasPermission('Read Roles And Permissions'),
+            show: hasPermission('Read Role And Permission'),
         },
         {
-            title: 'Users',
+            title: 'User',
             href: route('users.index'),
             icon: Users,
-            show: hasPermission('Read Users'),
+            show: hasPermission('Read User'),
         },
         {
             title: 'Setup',
             icon: Settings,
             href: '#',
-            show: hasAnyPermission('setting.general', 'setting.mail', 'setting.sms', 'setting.payment'),
+            show: hasAnyPermission('Read Class', 'Read Shift', 'Read Group'),
             childItems: [
                 {
                     title: 'Class',
@@ -62,12 +62,6 @@ const mainNavItems = computed(() => {
                     show: hasPermission('Read Shift'),
                 },
                 {
-                    title: 'Year',
-                    href: route('years.index'),
-                    icon: AppWindow,
-                    show: hasPermission('Read Year'),
-                },
-                {
                     title: 'Group',
                     href: route('groups.index'),
                     icon: AppWindow,
@@ -79,11 +73,11 @@ const mainNavItems = computed(() => {
             title: 'Expense',
             icon: Settings,
             href: '#',
-            show: hasAnyPermission('setting.general', 'setting.mail', 'setting.sms', 'setting.payment'),
+            show: hasAnyPermission('Read Expense Category', 'Read Expense'),
             childItems: [
                 {
                     title: 'Expense Category',
-                    href: route('expense.categories.index'),
+                    href: route('expense-categories.index'),
                     icon: AppWindow,
                     show: hasPermission('Read Expense Category'),
                 },

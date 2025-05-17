@@ -11,7 +11,7 @@ import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Roles Create',
+        title: 'Role Create',
         href: '/roles-create',
     },
 ];
@@ -34,7 +34,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Roles Create" />
+    <Head title="Role Create" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">

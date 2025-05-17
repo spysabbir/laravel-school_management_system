@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
             $table->string('name')->unique();
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
