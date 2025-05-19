@@ -18,7 +18,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->float('amount')->default(0);
             $table->date('date');
-            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');

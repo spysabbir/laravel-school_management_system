@@ -11,7 +11,11 @@ class Expense extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
+        'expense_category_id',
+        'title',
+        'description',
+        'amount',
+        'date',
         'status',
         'created_by',
         'updated_by',
@@ -31,5 +35,10 @@ class Expense extends Model
     public function deletedBy()
     {
         return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    public function expenseCategory()
+    {
+        return $this->belongsTo(ExpenseCategory::class)->withTrashed();
     }
 }

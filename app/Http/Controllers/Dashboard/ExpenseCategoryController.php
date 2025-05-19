@@ -18,29 +18,62 @@ class ExpenseCategoryController extends Controller
 
     public function create()
     {
-        return view('dashboard.expense-categories.create');
+        return Inertia::render('dashboard/expense-category/Create');
     }
 
     public function store(Request $request)
     {
-        // Store logic here
+
+        $request->validate([
+            'name' => 'required|string|max:255|unique:expense_categories,name',
+        ]);
+
+        ExpenseCategory::create([
+            'name' => $request->name,
+            'created_by' => auth()->user()->id,
+        ]);
+
         return redirect()->route('expense-categories.index');
     }
 
     public function edit($id)
     {
-        return view('dashboard.expense-categories.edit', compact('id'));
+        return Inertia::render('dashboard/expense-category/Edit', [
+            'expenseCategory' => ExpenseCategory::findOrFail($id),
+        ]);
     }
 
     public function update(Request $request, $id)
     {
-        // Update logic here
+        $request->validate([
+            'name' => 'required|string|max:255|unique:expense_categories,name,' . $id,
+        ]);
+
+        $expenseCategory = ExpenseCategory::findOrFail($id);
+        $expenseCategory->update([
+            'name' => $request->name,
+            'updated_by' => auth()->user()->id,
+        ]);
+
         return redirect()->route('expense-categories.index');
     }
 
     public function destroy($id)
     {
-        // Delete logic here
+        $expenseCategory = ExpenseCategory::findOrFail($id);
+
+        if ($expenseCategory->expenses()->count() > 0) {
+            return redirect()->back()->withErrors([
+                'error' => 'Cannot delete this category because it has associated expenses.',
+            ]);
+        }
+
+        $expenseCategory->update([
+            'deleted_by' => auth()->user()->id,
+        ]);
+
+        $expenseCategory->delete();
+
         return redirect()->route('expense-categories.index');
     }
 }

@@ -8,7 +8,7 @@ import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Expense Categories',
+        title: 'Expense Category',
         href: '/expense-categories',
     },
 ];
@@ -27,13 +27,20 @@ const confirmDelete = (expenseCategoryId: number) => {
                     description: new Date().toLocaleString(),
                 });
             },
+            onError: (errors) => {
+                if (errors.error) {
+                    toast.error('Error deleting expense category', {
+                        description: errors.error,
+                    });
+                }
+            },
         });
     }
 };
 </script>
 
 <template>
-    <Head title="Expense Categories" />
+    <Head title="Expense Category" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -49,6 +56,7 @@ const confirmDelete = (expenseCategoryId: number) => {
                         <TableRow>
                             <TableHead>ID</TableHead>
                             <TableHead>Name</TableHead>
+                            <TableHead>Status</TableHead>
                             <TableHead>Created At</TableHead>
                             <TableHead>Action</TableHead>
                         </TableRow>
@@ -57,6 +65,14 @@ const confirmDelete = (expenseCategoryId: number) => {
                         <TableRow v-for="(expenseCategory, index) in expenseCategories" :key="index">
                             <TableCell>{{ expenseCategory.id }}</TableCell>
                             <TableCell>{{ expenseCategory.name }}</TableCell>
+                            <TableCell>
+                                <span class="text-sm font-medium" :class="{
+                                    'text-green-500': expenseCategory.status === 'Active',
+                                    'text-red-500': expenseCategory.status === 'Inactive'
+                                }">
+                                    {{ expenseCategory.status }}
+                                </span>
+                            </TableCell>
                             <TableCell>
                                 <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
                                     {{ new Date(expenseCategory.created_at).toLocaleString('en-US', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}) }}
