@@ -49,7 +49,9 @@ const confirmDelete = (expenseId: number) => {
                         <TableRow>
                             <TableHead>ID</TableHead>
                             <TableHead>Category</TableHead>
-                            <TableHead>Name</TableHead>
+                            <TableHead>Title</TableHead>
+                            <TableHead>Amount</TableHead>
+                            <TableHead>Status</TableHead>
                             <TableHead>Created At</TableHead>
                             <TableHead>Action</TableHead>
                         </TableRow>
@@ -57,8 +59,22 @@ const confirmDelete = (expenseId: number) => {
                     <TableBody>
                         <TableRow v-for="(expense, index) in expenses" :key="index">
                             <TableCell>{{ expense.id }}</TableCell>
-                            <TableCell>{{ expense.category.name }}</TableCell>
-                            <TableCell>{{ expense.name }}</TableCell>
+                            <TableCell>{{ expense.expense_category.name }}</TableCell>
+                            <TableCell>{{ expense.title }}</TableCell>
+                            <TableCell>
+                                <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
+                                    {{ expense.amount }}
+                                </span>
+                            </TableCell>
+                            <TableCell>
+                                <span class="text-sm font-medium" :class="{
+                                    'text-green-600 dark:text-green-400': expense.status === 'Approved',
+                                    'text-red-600 dark:text-red-400': expense.status === 'Rejected',
+                                    'text-yellow-600 dark:text-yellow-400': expense.status === 'Pending',
+                                }">
+                                    {{ expense.status }}
+                                </span>
+                            </TableCell>
                             <TableCell>
                                 <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
                                     {{ new Date(expense.created_at).toLocaleString('en-US', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}) }}

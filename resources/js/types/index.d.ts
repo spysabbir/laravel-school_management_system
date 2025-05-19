@@ -68,3 +68,31 @@ export interface Permission {
     created_at: string;
     updated_at: string;
 }
+
+export interface ExpenseCategory {
+    id: number;
+    name: string;
+    status: string;
+    created_by: number;
+    updated_by: number | null;
+    deleted_by: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+}
+
+export interface Expense {
+    id: number;
+    expense_category_id: number;
+    title: string;
+    description: string;
+    amount: number;
+    date: string;
+    status: string;
+    created_by: number;
+    updated_by: number | null;
+    deleted_by: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+}
