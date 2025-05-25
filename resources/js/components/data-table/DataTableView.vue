@@ -6,11 +6,11 @@ import { Eye } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/dropdown-menu'
 
-interface DataTableViewOptionsProps {
+interface DataTableViewProps {
     table: Table<any>
 }
 
-const props = defineProps<DataTableViewOptionsProps>()
+const props = defineProps<DataTableViewProps>()
 
 const columns = computed(() =>
     props.table.getAllColumns().filter(

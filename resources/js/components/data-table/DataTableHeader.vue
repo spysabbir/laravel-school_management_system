@@ -9,12 +9,12 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
-interface DataTableColumnHeaderProps {
+interface DataTableHeaderProps {
     column: Column<any>
     title: string
 }
 
-defineProps<DataTableColumnHeaderProps>()
+defineProps<DataTableHeaderProps>()
 </script>
 
 <script lang="ts">

@@ -5,30 +5,52 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input'
 import { valueUpdater } from '@/lib/utils'
 import { computed } from 'vue'
-
 import { ref } from 'vue'
 
 import DataTablePagination from './DataTablePagination.vue'
-import DataTableViewOptions from './DataTableViewOptions.vue'
+import DataTableView from './DataTableView.vue'
+import DataTableFilter from './DataTableFilter.vue'
 
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
-    searchableColumns?: string[]
+    searchableColumns?: [string, ...string[]]
+    filterableColumns?: [string, ...string[]]
 }>()
 
 const searchs = computed(() =>
     (props.searchableColumns ?? []).map((key) => ({
         key,
         value: computed({
-        get: () => (table.getColumn(key)?.getFilterValue() as string) || '',
-        set: (val: string) => {
+            get: () => (table.getColumn(key)?.getFilterValue() as string) || '',
+            set: (val: string) => {
+                table.getColumn(key)?.setFilterValue(val)
+            },
+        }),
+    }))
+)
+
+const filters = computed(() =>
+    (props.filterableColumns ?? []).map((key) => ({
+        key,
+        value: computed({
+        get: () => table.getColumn(key)?.getFilterValue() ?? [],
+        set: (val: string[]) => {
             table.getColumn(key)?.setFilterValue(val)
         },
         }),
     }))
 )
 
+const getFacetedUniqueValues = (columnKey: string) => {
+    return props.data.reduce((acc, item) => {
+        const value = (item as Record<string, any>)[columnKey]
+        if (value && !acc.includes(value)) {
+            acc.push(value)
+        }
+        return acc
+    }, [] as string[])
+}
 
 const sorting = ref<SortingState>([])
 const columnFilters = ref<ColumnFiltersState>([])
@@ -61,7 +83,11 @@ const table = useVueTable({
             <Input class="max-w-sm" :placeholder="`Search by ${search.key}`" v-model="search.value" />
         </template>
 
-        <DataTableViewOptions :table="table" />
+        <template v-for="filter in filters" :key="filter.key">
+            <DataTableFilter :columnKey="filter.key" :table="table" :options="getFacetedUniqueValues(filter.key)" />
+        </template>
+
+        <DataTableView :table="table" />
     </div>
     <div class="border rounded-md p-2">
         <Table>
