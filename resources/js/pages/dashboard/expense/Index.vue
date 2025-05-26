@@ -2,9 +2,14 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem, type Expense } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Plus, Trash, Edit } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
+import DataTable from '../../../components/data-table/DataTable.vue';
+import { ColumnDef } from '@tanstack/vue-table';
+import DataTableHeader from '@/components/data-table/DataTableHeader.vue';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ref, h } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,23 +18,114 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-defineProps<{
+const props = defineProps<{
     expenses: Expense[];
 }>();
 
+const localExpenses = ref([...props.expenses]);
+const deletingIds = ref<number[]>([]);
+
 const confirmDelete = (expenseId: number) => {
     if (confirm('Are you sure you want to delete this expense?')) {
+        deletingIds.value.push(expenseId);
+
         router.delete(route('expenses.destroy', expenseId), {
             preserveScroll: true,
             onSuccess: () => {
-                router.reload();
+                localExpenses.value = localExpenses.value.filter(
+                    (item) => item.id !== expenseId
+                );
                 toast.success('Expense deleted successfully', {
                     description: new Date().toLocaleString(),
                 });
             },
+            onError: (errors) => {
+                if (errors.error) {
+                    toast.error('Error deleting expense', {
+                        description: errors.error,
+                    });
+                }
+            },
+            onFinish: () => {
+                deletingIds.value = deletingIds.value.filter(id => id !== expenseId);
+            },
         });
     }
 };
+
+const columns: ColumnDef<Expense>[] = [
+    {
+        id: 'select',
+        header: ({ table }) => h(Checkbox, {
+            'modelValue': table.getIsAllPageRowsSelected(),
+            'onUpdate:modelValue': (value: boolean | "indeterminate") => table.toggleAllPageRowsSelected(value === true),
+            'ariaLabel': 'Select all',
+        }),
+        cell: ({ row }) => h(Checkbox, {
+            'modelValue': row.getIsSelected(),
+            'onUpdate:modelValue': (value: boolean | "indeterminate") => row.toggleSelected(value === true),
+            'ariaLabel': 'Select row',
+        }),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        id: 'id',
+        accessorKey: 'id',
+        header: ({ column }) =>
+        h(DataTableHeader, {
+            column,
+            title: 'ID',
+        }),
+        cell: ({ row }) => row.original.id,
+    },
+    {
+        id: 'title',
+        accessorKey: 'title',
+        header: ({ column }) =>
+        h(DataTableHeader, {
+            column,
+            title: 'Title',
+        }),
+        cell: ({ row }) => row.original.title,
+    },
+    {
+        id: 'status',
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => {
+            const status = row.original.status;
+            return h('span', {
+                class: `inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`,
+            }, status);
+        },
+    },
+    {
+        id: 'actions',
+        accessorKey: 'actions',
+        header: 'Actions',
+        cell: ({ row }) => {
+            const expense = row.original;
+            const isDeleting = deletingIds.value.includes(expense.id);
+
+            return h('div', { class: 'flex items-center gap-2' }, [
+                h(Link, {
+                    href: route('expenses.edit', expense.id),
+                    class: 'inline-flex items-center px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600',
+                }, [
+                    h(Edit, { class: 'h-5 w-5' }),
+                ]),
+                h(Button, {
+                    variant: 'destructive',
+                    disabled: isDeleting,
+                    onClick: () => confirmDelete(expense.id),
+                }, [
+                    isDeleting ? h('span', { class: 'text-sm' }, '...') : h(Trash, { class: 'h-5 w-5' }),
+                ])
+            ]);
+        }
+    },
+];
 </script>
 
 <template>
@@ -43,54 +139,7 @@ const confirmDelete = (expenseId: number) => {
                 </Link>
             </div>
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
-                <Table>
-                    <TableCaption>A list of your expenses.</TableCaption>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Created At</TableHead>
-                            <TableHead>Action</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        <TableRow v-for="(expense, index) in expenses" :key="index">
-                            <TableCell>{{ expense.id }}</TableCell>
-                            <TableCell>{{ expense.expense_category.name }}</TableCell>
-                            <TableCell>{{ expense.title }}</TableCell>
-                            <TableCell>
-                                <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
-                                    {{ expense.amount }}
-                                </span>
-                            </TableCell>
-                            <TableCell>
-                                <span class="text-sm font-medium" :class="{
-                                    'text-green-600 dark:text-green-400': expense.status === 'Approved',
-                                    'text-red-600 dark:text-red-400': expense.status === 'Rejected',
-                                    'text-yellow-600 dark:text-yellow-400': expense.status === 'Pending',
-                                }">
-                                    {{ expense.status }}
-                                </span>
-                            </TableCell>
-                            <TableCell>
-                                <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
-                                    {{ new Date(expense.created_at).toLocaleString('en-US', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}) }}
-                                </span>
-                            </TableCell>
-                            <TableCell class="flex items-center gap-2">
-                                <Link :href="route('expenses.edit', expense.id)" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-200">
-                                    <Edit class="h-5 w-5" />
-                                </Link>
-                                <button @click="confirmDelete(expense.id)" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200">
-                                    <Trash class="h-5 w-5" />
-                                </button>
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
+                <DataTable :columns="columns" :data="localExpenses" :searchable-columns="['title']" :filterable-columns="['status']" />
             </div>
         </div>
     </AppLayout>
