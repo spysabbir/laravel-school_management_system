@@ -77,27 +77,19 @@ const columns: ColumnDef<Classe>[] = [
     {
         id: 'id',
         accessorKey: 'id',
-        header: ({ column }) =>
-        h(DataTableHeader, {
-            column,
-            title: 'ID',
-        }),
+        header: ({ column }) => h(DataTableHeader, { column, title: 'ID' }),
         cell: ({ row }) => row.original.id,
     },
     {
         id: 'name',
         accessorKey: 'name',
-        header: ({ column }) =>
-        h(DataTableHeader, {
-            column,
-            title: 'Name',
-        }),
+        header: ({ column }) => h(DataTableHeader, { column, title: 'Name' }),
         cell: ({ row }) => row.original.name,
     },
     {
         id: 'status',
         accessorKey: 'status',
-        header: 'Status',
+        header: ({ column }) => h(DataTableHeader, { column, title: 'Status' }),
         cell: ({ row }) => {
             const status = row.original.status;
             return h('span', {
@@ -136,7 +128,7 @@ const form = useForm({
     name: '',
 });
 
-const editingClasse = ref<Classs | null>(null);
+const editingClasse = ref<Classe | null>(null);
 const dialogOpen = ref(false);
 
 const openCreateDialog = () => {

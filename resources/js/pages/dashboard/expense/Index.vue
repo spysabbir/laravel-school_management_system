@@ -72,31 +72,23 @@ const columns: ColumnDef<Expense>[] = [
     {
         id: 'id',
         accessorKey: 'id',
-        header: ({ column }) =>
-        h(DataTableHeader, {
-            column,
-            title: 'ID',
-        }),
+        header: ({ column }) => h(DataTableHeader, { column, title: 'ID' }),
         cell: ({ row }) => row.original.id,
     },
     {
         id: 'title',
         accessorKey: 'title',
-        header: ({ column }) =>
-        h(DataTableHeader, {
-            column,
-            title: 'Title',
-        }),
+        header: ({ column }) => h(DataTableHeader, { column, title: 'Title' }),
         cell: ({ row }) => row.original.title,
     },
     {
         id: 'status',
         accessorKey: 'status',
-        header: 'Status',
+        header: ({ column }) => h(DataTableHeader, { column, title: 'Status' }),
         cell: ({ row }) => {
             const status = row.original.status;
             return h('span', {
-                class: `inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`,
+                class: `inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${status === 'Approved' ? 'bg-green-100 text-green-800' : status === 'Rejected' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`,
             }, status);
         },
     },

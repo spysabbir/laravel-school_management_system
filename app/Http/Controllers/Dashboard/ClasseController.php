@@ -11,7 +11,9 @@ class ClasseController extends Controller
 {
     public function index()
     {
-        $classes = Classe::all();
+        $classes = Classe::with(['createdBy', 'updatedBy', 'deletedBy'])
+            ->orderBy('created_at', 'desc')
+            ->get();
         return Inertia::render('dashboard/classe/Index', [
             'classes' => $classes,
         ]);

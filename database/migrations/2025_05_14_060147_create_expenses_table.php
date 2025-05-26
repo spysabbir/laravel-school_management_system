@@ -21,8 +21,12 @@ return new class extends Migration
             $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('rejected_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
+            $table->dateTime('approved_at')->nullable();
+            $table->dateTime('rejected_at')->nullable();
             $table->softDeletes();
         });
     }

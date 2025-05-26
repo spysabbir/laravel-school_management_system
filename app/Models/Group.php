@@ -11,12 +11,18 @@ class Group extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'class_id',
         'name',
         'status',
         'created_by',
         'updated_by',
         'deleted_by',
     ];
+
+    public function class()
+    {
+        return $this->belongsTo(Classe::class, 'class_id');
+    }
 
     public function createdBy()
     {
