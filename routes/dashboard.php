@@ -6,7 +6,7 @@ use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\Account\PasswordController;
 use App\Http\Controllers\Dashboard\Account\ProfileController;
 use App\Http\Controllers\Dashboard\SettingController;
-use App\Http\Controllers\Dashboard\ClassController;
+use App\Http\Controllers\Dashboard\ClasseController;
 use App\Http\Controllers\Dashboard\ExamController;
 use App\Http\Controllers\Dashboard\ExpenseCategoryController;
 use App\Http\Controllers\Dashboard\ExpenseController;
@@ -36,7 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('users', UserController::class);
 
-    Route::resource('classes', ClassController::class)->except(['show']);
+    Route::resource('classes', ClasseController::class)->except(['show']);
     Route::resource('shifts', ShiftController::class)->except(['show']);
     Route::resource('years', YearController::class)->except(['show']);
     Route::resource('groups', GroupController::class)->except(['show']);

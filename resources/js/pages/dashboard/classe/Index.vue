@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, h } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem, type ExpenseCategory } from '@/types';
+import { type BreadcrumbItem, type Classe } from '@/types';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { Plus, Trash, Edit } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
@@ -18,47 +18,47 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Expense Category',
-        href: '/expense-categories',
+        title: 'Class',
+        href: '/classes',
     },
 ];
 
 const props = defineProps<{
-    expenseCategories: ExpenseCategory[];
+    classes: Classe[];
 }>();
 
-const localExpenseCategories = ref([...props.expenseCategories]);
+const localClasses = ref([...props.classes]);
 const deletingIds = ref<number[]>([]);
 
-const confirmDelete = (expenseCategoryId: number) => {
-    if (confirm('Are you sure you want to delete this expense category?')) {
-        deletingIds.value.push(expenseCategoryId);
+const confirmDelete = (classeId: number) => {
+    if (confirm('Are you sure you want to delete this class?')) {
+        deletingIds.value.push(classeId);
 
-        router.delete(route('expense-categories.destroy', expenseCategoryId), {
+        router.delete(route('classes.destroy', classeId), {
             preserveScroll: true,
             onSuccess: () => {
-                localExpenseCategories.value = localExpenseCategories.value.filter(
-                    (item) => item.id !== expenseCategoryId
+                localClasses.value = localClasses.value.filter(
+                    (item) => item.id !== classeId
                 );
-                toast.success('Expense category deleted successfully', {
+                toast.success('Class deleted successfully', {
                     description: new Date().toLocaleString(),
                 });
             },
             onError: (errors) => {
                 if (errors.error) {
-                    toast.error('Error deleting expense category', {
+                    toast.error('Error deleting Class', {
                         description: errors.error,
                     });
                 }
             },
             onFinish: () => {
-                deletingIds.value = deletingIds.value.filter(id => id !== expenseCategoryId);
+                deletingIds.value = deletingIds.value.filter(id => id !== classeId);
             },
         });
     }
 };
 
-const columns: ColumnDef<ExpenseCategory>[] = [
+const columns: ColumnDef<Classe>[] = [
     {
         id: 'select',
         header: ({ table }) => h(Checkbox, {
@@ -110,20 +110,20 @@ const columns: ColumnDef<ExpenseCategory>[] = [
         accessorKey: 'actions',
         header: 'Actions',
         cell: ({ row }) => {
-            const expenseCategory = row.original;
-            const isDeleting = deletingIds.value.includes(expenseCategory.id);
+            const classe = row.original;
+            const isDeleting = deletingIds.value.includes(classe.id);
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(Button, {
                     variant: 'outline',
-                    onClick: () => openEditDialog(expenseCategory),
+                    onClick: () => openEditDialog(classe),
                 }, [
                     h(Edit, { class: 'h-4 w-4' })
                 ]),
                 h(Button, {
                     variant: 'destructive',
                     disabled: isDeleting,
-                    onClick: () => confirmDelete(expenseCategory.id),
+                    onClick: () => confirmDelete(classe.id),
                 }, [
                     isDeleting ? h('span', { class: 'text-sm' }, '...') : h(Trash, { class: 'h-5 w-5' }),
                 ])
@@ -136,58 +136,58 @@ const form = useForm({
     name: '',
 });
 
-const editingExpenseCategory = ref<ExpenseCategory | null>(null);
+const editingClasse = ref<Classs | null>(null);
 const dialogOpen = ref(false);
 
 const openCreateDialog = () => {
     form.reset();
     form.clearErrors();
-    editingExpenseCategory.value = null;
+    editingClasse.value = null;
     dialogOpen.value = true;
 };
 
-const openEditDialog = (expenseCategory: ExpenseCategory) => {
-    form.name = expenseCategory.name;
-    editingExpenseCategory.value = expenseCategory;
+const openEditDialog = (classe: Classe) => {
+    form.name = classe.name;
+    editingClasse.value = classe;
     dialogOpen.value = true;
 };
 
 const submit = () => {
-    if (editingExpenseCategory.value) {
-        form.put(route('expense-categories.update', editingExpenseCategory.value.id), {
+    if (editingClasse.value) {
+        form.put(route('classes.update', editingClasse.value.id), {
             onSuccess: () => {
-                toast.success('Expense category updated successfully', {
+                toast.success('Class updated successfully', {
                     description: new Date().toLocaleString(),
                 });
                 form.reset();
                 form.clearErrors();
                 dialogOpen.value = false;
 
-                localExpenseCategories.value = [...props.expenseCategories];
+                localClasses.value = [...props.classes];
             },
             onError: (errors) => {
                 if (errors.error) {
-                    toast.error('Error updating expense category', {
+                    toast.error('Error updating class', {
                         description: errors.error,
                     });
                 }
             },
         });
     } else {
-        form.post(route('expense-categories.store'), {
+        form.post(route('classes.store'), {
             onSuccess: () => {
-                toast.success('Expense category created successfully', {
+                toast.success('Class created successfully', {
                     description: new Date().toLocaleString(),
                 });
                 form.reset();
                 form.clearErrors();
                 dialogOpen.value = false;
 
-                localExpenseCategories.value = [...props.expenseCategories];
+                localClasses.value = [...props.classes];
             },
             onError: (errors) => {
                 if (errors.error) {
-                    toast.error('Error creating expense category', {
+                    toast.error('Error creating class', {
                         description: errors.error,
                     });
                 }
@@ -198,7 +198,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Expense Category" />
+    <Head title="Class" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -206,27 +206,27 @@ const submit = () => {
                 <Dialog v-model:open="dialogOpen">
                     <DialogTrigger as-child>
                         <Button @click="openCreateDialog" class="flex items-center gap-2">
-                            <Plus class="h-4 w-4" /> New Expense Category
+                            <Plus class="h-4 w-4" /> New Class
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>{{ editingExpenseCategory ? 'Edit' : 'Create' }} Expense Category</DialogTitle>
+                            <DialogTitle>{{ editingClasse ? 'Edit' : 'Create' }} Class</DialogTitle>
                             <DialogDescription>
-                                {{ editingExpenseCategory ? 'Edit' : 'Create' }} an expense category to manage your expense categories effectively.
+                                {{ editingClasse ? 'Edit' : 'Create' }} an class to manage your classes effectively.
                             </DialogDescription>
                         </DialogHeader>
                         <form @submit.prevent="submit" class="p-4">
                             <div class="grid gap-6">
                                 <div class="grid gap-2">
-                                    <Label for="name">Expense Category Name</Label>
-                                    <Input id="name" type="text" v-model="form.name" placeholder="Expense Category Name" />
+                                    <Label for="name">Class Name</Label>
+                                    <Input id="name" type="text" v-model="form.name" placeholder="Class Name" />
                                     <InputError :message="form.errors.name" />
                                 </div>
                                 <div class="flex justify-end">
                                     <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                                         <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                                        {{ editingExpenseCategory ? 'Update' : 'Create' }}
+                                        {{ editingClasse ? 'Update' : 'Create' }}
                                     </Button>
                                 </div>
                             </div>
@@ -243,7 +243,7 @@ const submit = () => {
             </div>
 
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
-                <DataTable :columns="columns" :data="localExpenseCategories" :searchable-columns="['name']" :filterable-columns="['status']" />
+                <DataTable :columns="columns" :data="localClasses" :searchable-columns="['name']" :filterable-columns="['status']" />
             </div>
         </div>
     </AppLayout>

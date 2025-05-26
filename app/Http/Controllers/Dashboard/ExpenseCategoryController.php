@@ -16,11 +16,6 @@ class ExpenseCategoryController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render('dashboard/expense-category/Create');
-    }
-
     public function store(Request $request)
     {
 
@@ -34,13 +29,6 @@ class ExpenseCategoryController extends Controller
         ]);
 
         return redirect()->route('expense-categories.index');
-    }
-
-    public function edit($id)
-    {
-        return Inertia::render('dashboard/expense-category/Edit', [
-            'expenseCategory' => ExpenseCategory::findOrFail($id),
-        ]);
     }
 
     public function update(Request $request, $id)

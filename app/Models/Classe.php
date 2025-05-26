@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
-class Classes extends Model
+class Classe extends Model
 {
     use SoftDeletes;
-    
+
     protected $fillable = [
         'name',
         'status',
