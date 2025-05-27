@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
             $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
-            $table->foreignId('group_id')->constrained('groups')->onDelete('cascade');
-            $table->enum('type', ['Compulsory', 'Optional'])->default('Compulsory');
+            $table->foreignId('group_id')->nullable()->constrained('groups')->onDelete('cascade');
+            $table->enum('type', ['Compulsory', 'Optional', 'Practical']);
             $table->string('name');
             $table->string('code');
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
@@ -24,6 +24,11 @@ return new class extends Migration
             $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['class_id', 'name']);
+            $table->unique(['class_id', 'code']);
+            $table->unique(['class_id', 'group_id', 'name']);
+            $table->unique(['class_id', 'group_id', 'code']);
         });
     }
 

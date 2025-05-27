@@ -91,8 +91,8 @@ const columns: ColumnDef<Group>[] = [
         accessorKey: 'class_id',
         header: ({ column }) => h(DataTableHeader, { column, title: 'Class' }),
         cell: ({ row }) => {
-            const classId = row.original.class_name;
-            return classId
+            const className = row.original.class_name;
+            return h('span', { class: 'text-sm text-gray-600 dark:text-gray-400' }, className);
         },
     },
     {

@@ -11,12 +11,25 @@ class Subject extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'class_id',
+        'group_id',
+        'type',
         'name',
+        'code',
         'status',
         'created_by',
         'updated_by',
         'deleted_by',
     ];
+    public function class()
+    {
+        return $this->belongsTo(Classe::class, 'class_id');
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
+    }
 
     public function createdBy()
     {

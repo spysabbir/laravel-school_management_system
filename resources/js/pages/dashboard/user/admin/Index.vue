@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { ref, h } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem, type Shift, type Classe } from '@/types';
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { type BreadcrumbItem, type User, type Role } from '@/types';
+import { Head, router } from '@inertiajs/vue3';
 import { Plus, Trash, Edit } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 import { ColumnDef } from '@tanstack/vue-table';
 import DataTableHeader from '@/components/data-table/DataTableHeader.vue';
 import { Button } from '@/components/ui/button';
-import DataTable from '../../../components/data-table/DataTable.vue';
+import DataTable from '../../../../components/data-table/DataTable.vue';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
@@ -16,55 +15,56 @@ import { Label } from '@/components/ui/label';
 import { LoaderCircle } from 'lucide-vue-next';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useForm } from '@inertiajs/vue3';
+import { h, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Shift',
-        href: '/shifts',
+        title: 'User ( Admin )',
+        href: route('admins.index'),
     },
 ];
 
 const props = defineProps<{
-    shifts: Shift[];
-    classes: Classe[];
+    users: User[];
+    roles: Role[];
 }>();
 
-const localShifts = ref(props.shifts.map(shift => ({
-    ...shift,
-    class_name: shift.class.name,
+const localUsers = ref(props.users.map(user => ({
+    ...user,
 })));
 
 const deletingIds = ref<number[]>([]);
 
-const confirmDelete = (shiftId: number) => {
-    if (confirm('Are you sure you want to delete this shift?')) {
-        deletingIds.value.push(shiftId);
+const confirmDelete = (userId: number) => {
+    if (confirm('Are you sure you want to delete this user?')) {
+        deletingIds.value.push(userId);
 
-        router.delete(route('shifts.destroy', shiftId), {
+        router.delete(route('users.destroy', userId), {
             preserveScroll: true,
             onSuccess: () => {
-                localShifts.value = localShifts.value.filter(
-                    (item) => item.id !== shiftId
+                localUsers.value = localUsers.value.filter(
+                    (item) => item.id !== userId
                 );
-                toast.success('Shift deleted successfully', {
+                toast.success('User deleted successfully', {
                     description: new Date().toLocaleString(),
                 });
             },
             onError: (errors) => {
                 if (errors.error) {
-                    toast.error('Error deleting shift', {
+                    toast.error('Error deleting User', {
                         description: errors.error,
                     });
                 }
             },
             onFinish: () => {
-                deletingIds.value = deletingIds.value.filter(id => id !== shiftId);
+                deletingIds.value = deletingIds.value.filter(id => id !== userId);
             },
         });
     }
 };
 
-const columns: ColumnDef<Shift>[] = [
+const columns: ColumnDef<User>[] = [
     {
         id: 'select',
         header: ({ table }) => h(Checkbox, {
@@ -85,15 +85,6 @@ const columns: ColumnDef<Shift>[] = [
         accessorKey: 'id',
         header: ({ column }) => h(DataTableHeader, { column, title: 'ID' }),
         cell: ({ row }) => row.original.id,
-    },
-    {
-        id: 'class_id',
-        accessorKey: 'class_id',
-        header: ({ column }) => h(DataTableHeader, { column, title: 'Class' }),
-        cell: ({ row }) => {
-            const className = row.original.class_name;
-            return h('span', { class: 'text-sm text-gray-600 dark:text-gray-400' }, className);
-        },
     },
     {
         id: 'name',
@@ -117,20 +108,20 @@ const columns: ColumnDef<Shift>[] = [
         accessorKey: 'actions',
         header: 'Actions',
         cell: ({ row }) => {
-            const shift = row.original;
-            const isDeleting = deletingIds.value.includes(shift.id);
+            const user = row.original;
+            const isDeleting = deletingIds.value.includes(user.id);
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(Button, {
                     variant: 'outline',
-                    onClick: () => openEditDialog(shift),
+                    onClick: () => openEditDialog(user),
                 }, [
                     h(Edit, { class: 'h-4 w-4' })
                 ]),
                 h(Button, {
                     variant: 'destructive',
                     disabled: isDeleting,
-                    onClick: () => confirmDelete(shift.id),
+                    onClick: () => confirmDelete(user.id),
                 }, [
                     isDeleting ? h('span', { class: 'text-sm' }, '...') : h(Trash, { class: 'h-5 w-5' }),
                 ])
@@ -139,70 +130,76 @@ const columns: ColumnDef<Shift>[] = [
     },
 ];
 
-const form = useForm({
-    class_id: null as number | null,
+const form = useForm<{
+    role_ids: string[];
+    name: string;
+    email: string;
+    password: string;
+}>({
+    role_ids: [],
     name: '',
+    email: '',
+    password: '',
 });
 
-const editingShift = ref<Shift | null>(null);
+const editingUser= ref<User | null>(null);
 const dialogOpen = ref(false);
 
 const openCreateDialog = () => {
     form.reset();
     form.clearErrors();
-    editingShift.value = null;
+    editingUser.value = null;
     dialogOpen.value = true;
 };
 
-const openEditDialog = (shift: Shift) => {
-    form.class_id = shift.class_id;
-    form.name = shift.name;
-    editingShift.value = shift;
+const openEditDialog = (user: User) => {
+    form.role_ids = user.roles.map(role => role.id.toString());
+    form.name = user.name;
+    form.email = user.email;
+    editingUser.value = user;
     dialogOpen.value = true;
 };
 
 const submit = () => {
-    if (editingShift.value) {
-        form.put(route('shifts.update', editingShift.value.id), {
+    if (editingUser.value) {
+        form.put(route('users.update', editingUser.value.id), {
             onSuccess: () => {
-                toast.success('Shift updated successfully', {
+                toast.success('User updated successfully', {
                     description: new Date().toLocaleString(),
                 });
                 form.reset();
                 form.clearErrors();
                 dialogOpen.value = false;
 
-                localShifts.value = props.shifts.map(shift => ({
-                    ...shift,
-                    class_name: shift.class.name,
+                localUsers.value = props.users.map(user => ({
+                    ...user,
                 }));
             },
             onError: (errors) => {
                 if (errors.error) {
-                    toast.error('Error updating shift', {
+                    toast.error('Error updating User', {
                         description: errors.error,
                     });
                 }
             },
         });
     } else {
-        form.post(route('shifts.store'), {
+        form.post(route('users.store'), {
             onSuccess: () => {
-                toast.success('Shift created successfully', {
+                toast.success('User created successfully', {
                     description: new Date().toLocaleString(),
                 });
                 form.reset();
                 form.clearErrors();
                 dialogOpen.value = false;
 
-                localShifts.value = props.shifts.map(shift => ({
-                    ...shift,
-                    class_name: shift.class.name,
+                localUsers.value = props.users.map(user => ({
+                    ...user,
                 }));
             },
             onError: (errors) => {
                 if (errors.error) {
-                    toast.error('Error creating shift', {
+                    toast.error('Error creating user', {
                         description: errors.error,
                     });
                 }
@@ -213,7 +210,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Shift" />
+    <Head title="User ( Admin )" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -221,46 +218,58 @@ const submit = () => {
                 <Dialog v-model:open="dialogOpen">
                     <DialogTrigger as-child>
                         <Button @click="openCreateDialog" class="flex items-center gap-2">
-                            <Plus class="h-4 w-4" /> New Shift
+                            <Plus class="h-4 w-4" /> New User ( Admin )
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>{{ editingShift ? 'Edit' : 'Create' }} Shift</DialogTitle>
+                            <DialogTitle>{{ editingUser ? 'Edit' : 'Create' }} User</DialogTitle>
                             <DialogDescription>
-                                {{ editingShift ? 'Edit' : 'Create' }} an shift to manage your shifts effectively.
+                                {{ editingUser ? 'Edit' : 'Create' }} an user to manage your users effectively.
                             </DialogDescription>
                         </DialogHeader>
                         <form @submit.prevent="submit" class="p-4">
                             <div class="grid gap-6">
                                 <div class="grid gap-2">
-                                    <Label for="class_id">Class</Label>
-                                    <Select id="class_id" v-model="form.class_id">
+                                    <Label>Roles</Label>
+                                    <Select v-model="form.role_ids" multiple>
                                         <SelectTrigger class="w-full">
-                                            <SelectValue placeholder="Select a class" />
+                                            <SelectValue placeholder="Select roles" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                <SelectLabel>Classes</SelectLabel>
-                                                <SelectItem v-for="classe in classes" :key="classe.id" :value="classe.id">
-                                                    {{ classe.name }}
+                                                <SelectLabel>Roles</SelectLabel>
+                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.id">
+                                                    {{ role.name }}
                                                 </SelectItem>
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    <InputError :message="form.errors.class_id" />
+                                    <InputError :message="form.errors.role_ids" />
                                 </div>
+
                                 <div class="grid gap-2">
-                                    <Label for="name">Shift Name</Label>
-                                    <Input id="name" type="text" v-model="form.name" placeholder="Shift Name" />
+                                    <Label for="name">Name</Label>
+                                    <Input id="name" type="text" v-model="form.name" placeholder="Name" />
                                     <InputError :message="form.errors.name" />
                                 </div>
-                                <div class="flex justify-end">
-                                    <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
-                                        <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                                        {{ editingShift ? 'Update' : 'Create' }}
-                                    </Button>
+
+                                <div class="grid gap-2">
+                                    <Label for="email">Email</Label>
+                                    <Input id="email" type="email" v-model="form.email" placeholder="Email" />
+                                    <InputError :message="form.errors.email" />
                                 </div>
+
+                                <div class="grid gap-2">
+                                    <Label for="password">Password</Label>
+                                    <Input id="password" type="password" v-model="form.password" placeholder="Password" />
+                                    <InputError :message="form.errors.password" />
+                                </div>
+
+                                <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
+                                    <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
+                                    Create User
+                                </Button>
                             </div>
                         </form>
                         <DialogFooter>
@@ -275,7 +284,7 @@ const submit = () => {
             </div>
 
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
-                <DataTable :columns="columns" :data="localShifts" :searchable-columns="['name']" :filterable-columns="['class_name', 'status']" />
+                <DataTable :columns="columns" :data="localUsers" :searchable-columns="['name']" :filterable-columns="['status']" />
             </div>
         </div>
     </AppLayout>

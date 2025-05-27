@@ -39,15 +39,47 @@ const mainNavItems = computed(() => {
         },
         {
             title: 'User',
-            href: route('users.index'),
             icon: Users,
-            show: hasPermission('Read User'),
+            href: '#',
+            show: hasAnyPermission('Read Class', 'Read Shift', 'Read Group'),
+            childItems: [
+                {
+                    title: 'Admin',
+                    href: route('admins.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Admin'),
+                },
+                {
+                    title: 'Student',
+                    href: route('students.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Student'),
+                },
+                {
+                    title: 'Teacher',
+                    href: route('teachers.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Teacher'),
+                },
+                {
+                    title: 'Staff',
+                    href: route('staffs.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Staff'),
+                },
+                {
+                    title: 'Parent',
+                    href: route('parents.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Parent'),
+                },
+            ],
         },
         {
             title: 'Setup',
             icon: Settings,
             href: '#',
-            show: hasAnyPermission('Read Class', 'Read Shift', 'Read Group'),
+            show: hasAnyPermission('Read Class', 'Read Shift', 'Read Group', 'Read Subject', 'Read Syllabus'),
             childItems: [
                 {
                     title: 'Class',
@@ -66,6 +98,32 @@ const mainNavItems = computed(() => {
                     href: route('groups.index'),
                     icon: AppWindow,
                     show: hasPermission('Read Group'),
+                },
+                {
+                    title: 'Subject',
+                    href: route('subjects.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Subject'),
+                }
+            ],
+        },
+        {
+            title: 'Academic',
+            icon: Settings,
+            href: '#',
+            show: hasAnyPermission('Read Attendance', 'Read Routine'),
+            childItems: [
+                {
+                    title: 'Attendance',
+                    href: route('attendances.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Attendance'),
+                },
+                {
+                    title: 'Routine',
+                    href: route('routines.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Routine'),
                 },
             ],
         },

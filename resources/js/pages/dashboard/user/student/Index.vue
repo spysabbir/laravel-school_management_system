@@ -8,13 +8,13 @@ import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Classes',
-        href: '/classes',
+        title: 'User ( Student )',
+        href: route('students.index'),
     },
 ];
 
 defineProps<{
-    classes: User[],
+    users: User[],
 }>();
 
 const confirmDelete = (userId: number) => {
@@ -33,7 +33,7 @@ const confirmDelete = (userId: number) => {
 </script>
 
 <template>
-    <Head title="Classes" />
+    <Head title="User ( Student )" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">

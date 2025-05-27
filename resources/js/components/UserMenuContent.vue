@@ -27,7 +27,7 @@ defineProps<Props>();
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full" :href="route('account')" prefetch as="button">
                 <UserCog class="mr-2 h-4 w-4" />
-                Account Settings
+                My Account
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>

@@ -8,8 +8,8 @@ import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'User',
-        href: '/users',
+        title: 'User ( Teacher )',
+        href: route('teachers.index'),
     },
 ];
 
@@ -33,7 +33,7 @@ const confirmDelete = (userId: number) => {
 </script>
 
 <template>
-    <Head title="User" />
+    <Head title="User ( Teacher )" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">

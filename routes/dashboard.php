@@ -3,6 +3,11 @@
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\RoleAndPermissionController;
 use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Dashboard\User\AdminController;
+use App\Http\Controllers\Dashboard\User\TeacherController;
+use App\Http\Controllers\Dashboard\User\StaffController;
+use App\Http\Controllers\Dashboard\User\StudentController;
+use App\Http\Controllers\Dashboard\User\ParentController;
 use App\Http\Controllers\Dashboard\Account\PasswordController;
 use App\Http\Controllers\Dashboard\Account\ProfileController;
 use App\Http\Controllers\Dashboard\SettingController;
@@ -11,11 +16,8 @@ use App\Http\Controllers\Dashboard\ExamController;
 use App\Http\Controllers\Dashboard\ExpenseCategoryController;
 use App\Http\Controllers\Dashboard\ExpenseController;
 use App\Http\Controllers\Dashboard\ShiftController;
-use App\Http\Controllers\Dashboard\YearController;
 use App\Http\Controllers\Dashboard\GroupController;
-use App\Http\Controllers\Dashboard\StudentController;
 use App\Http\Controllers\Dashboard\SubjectController;
-use App\Http\Controllers\Dashboard\TeacherController;
 use Illuminate\Support\Facades\Route;
 
 // Dashboard routes
@@ -35,16 +37,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::resource('users', UserController::class);
+    Route::resource('admins', AdminController::class);
+    Route::resource('teachers', TeacherController::class);
+    Route::resource('staffs', StaffController::class);
+    Route::resource('students', StudentController::class);
+    Route::resource('parents', ParentController::class);
 
     Route::resource('classes', ClasseController::class)->except(['show']);
     Route::resource('shifts', ShiftController::class)->except(['show']);
-    Route::resource('years', YearController::class)->except(['show']);
     Route::resource('groups', GroupController::class)->except(['show']);
+    Route::resource('attendances', GroupController::class)->except(['show']);
+    Route::resource('routines', GroupController::class)->except(['show']);
 
     Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show']);
     Route::resource('expenses', ExpenseController::class)->except(['show']);
-    Route::resource('students', StudentController::class)->except(['show']);
-    Route::resource('teachers', TeacherController::class)->except(['show']);
     Route::resource('subjects', SubjectController::class)->except(['show']);
     Route::resource('exams', ExamController::class)->except(['show']);
 

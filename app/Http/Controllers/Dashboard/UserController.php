@@ -10,12 +10,7 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        return Inertia::render('dashboard/user/Index', [
-            'users' => User::with('roles')->get(),
-        ]);
-    }
+    
 
     public function create()
     {
