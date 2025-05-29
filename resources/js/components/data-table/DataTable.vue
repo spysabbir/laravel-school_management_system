@@ -80,7 +80,7 @@ const table = useVueTable({
 <template>
     <div class="flex items-center p-5">
         <template v-for="search in searchs" :key="search.key">
-            <Input class="max-w-sm" :placeholder="`Search by ${search.key}`" v-model="search.value" />
+            <Input :placeholder="`Search by ${search.key}`" v-model="search.value" class="max-w-sm mr-2" />
         </template>
 
         <template v-for="filter in filters" :key="filter.key">

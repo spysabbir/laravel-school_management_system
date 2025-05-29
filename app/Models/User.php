@@ -31,6 +31,7 @@ class User extends Authenticatable
         'present_address',
         'permanent_address',
         'profile_photo',
+        'status',
     ];
 
     /**

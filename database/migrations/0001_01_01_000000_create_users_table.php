@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('profile_photo')->default('default_profile_photo.png');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->enum('status', ['Active', 'Inactive', 'Suspended'])->default('Active');
             $table->enum('type', ['Admin', 'Teacher', 'Staff', 'Student', 'Parent']);
             $table->rememberToken();
             $table->timestamps();

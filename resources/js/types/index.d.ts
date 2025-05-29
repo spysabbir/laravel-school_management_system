@@ -48,6 +48,8 @@ export interface User {
     updated_at: string;
     roles: Role[];
     permissions: Permission[];
+    status: string;
+    type: string;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

@@ -93,13 +93,28 @@ const columns: ColumnDef<User>[] = [
         cell: ({ row }) => row.original.name,
     },
     {
+        id: 'email',
+        accessorKey: 'email',
+        header: ({ column }) => h(DataTableHeader, { column, title: 'Email' }),
+        cell: ({ row }) => row.original.email,
+    },
+    {
+        id: 'roles',
+        accessorKey: 'roles',
+        header: ({ column }) => h(DataTableHeader, { column, title: 'Roles' }),
+        cell: ({ row }) => {
+            const roles = row.original.roles.map(role => role.name).join(', ');
+            return h('span', { class: 'text-sm text-muted-foreground' }, roles);
+        },
+    },
+    {
         id: 'status',
         accessorKey: 'status',
         header: ({ column }) => h(DataTableHeader, { column, title: 'Status' }),
         cell: ({ row }) => {
             const status = row.original.status;
             return h('span', {
-                class: `inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`,
+                class: `inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : status === 'Inactive' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`
             }, status);
         },
     },
@@ -135,11 +150,13 @@ const form = useForm<{
     name: string;
     email: string;
     password: string;
+    status?: string;
 }>({
     role_ids: [],
     name: '',
     email: '',
     password: '',
+    status: 'Active',
 });
 
 const editingUser= ref<User | null>(null);
@@ -156,13 +173,15 @@ const openEditDialog = (user: User) => {
     form.role_ids = user.roles.map(role => role.id.toString());
     form.name = user.name;
     form.email = user.email;
+    form.status = user.status;
+    form.clearErrors();
     editingUser.value = user;
     dialogOpen.value = true;
 };
 
 const submit = () => {
     if (editingUser.value) {
-        form.put(route('users.update', editingUser.value.id), {
+        form.put(route('admins.update', editingUser.value.id), {
             onSuccess: () => {
                 toast.success('User updated successfully', {
                     description: new Date().toLocaleString(),
@@ -171,9 +190,7 @@ const submit = () => {
                 form.clearErrors();
                 dialogOpen.value = false;
 
-                localUsers.value = props.users.map(user => ({
-                    ...user,
-                }));
+                localUsers.value = props.users.map(user => ({ ...user }));
             },
             onError: (errors) => {
                 if (errors.error) {
@@ -184,7 +201,7 @@ const submit = () => {
             },
         });
     } else {
-        form.post(route('users.store'), {
+        form.post(route('admins.store'), {
             onSuccess: () => {
                 toast.success('User created successfully', {
                     description: new Date().toLocaleString(),
@@ -193,9 +210,7 @@ const submit = () => {
                 form.clearErrors();
                 dialogOpen.value = false;
 
-                localUsers.value = props.users.map(user => ({
-                    ...user,
-                }));
+                localUsers.value = props.users.map(user => ({ ...user }));
             },
             onError: (errors) => {
                 if (errors.error) {
@@ -239,7 +254,7 @@ const submit = () => {
                                         <SelectContent>
                                             <SelectGroup>
                                                 <SelectLabel>Roles</SelectLabel>
-                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.id">
+                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.id.toString()">
                                                     {{ role.name }}
                                                 </SelectItem>
                                             </SelectGroup>
@@ -260,15 +275,33 @@ const submit = () => {
                                     <InputError :message="form.errors.email" />
                                 </div>
 
-                                <div class="grid gap-2">
+                                <div v-if="!editingUser" class="grid gap-2">
                                     <Label for="password">Password</Label>
                                     <Input id="password" type="password" v-model="form.password" placeholder="Password" />
                                     <InputError :message="form.errors.password" />
                                 </div>
 
+                                <div class="grid gap-2">
+                                    <Label>Status</Label>
+                                    <Select v-model="form.status">
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Status</SelectLabel>
+                                                <SelectItem value="Active">Active</SelectItem>
+                                                <SelectItem value="Inactive">Inactive</SelectItem>
+                                                <SelectItem value="Suspended">Suspended</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError :message="form.errors.status" />
+                                </div>
+
                                 <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                                    Create User
+                                    {{ editingUser ? 'Edit' : 'Create' }} User
                                 </Button>
                             </div>
                         </form>
@@ -284,7 +317,7 @@ const submit = () => {
             </div>
 
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
-                <DataTable :columns="columns" :data="localUsers" :searchable-columns="['name']" :filterable-columns="['status']" />
+                <DataTable :columns="columns" :data="localUsers" :searchable-columns="['name', 'email']" :filterable-columns="['status']" />
             </div>
         </div>
     </AppLayout>

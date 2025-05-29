@@ -41,19 +41,13 @@ const mainNavItems = computed(() => {
             title: 'User',
             icon: Users,
             href: '#',
-            show: hasAnyPermission('Read Class', 'Read Shift', 'Read Group'),
+            show: hasAnyPermission('Read Admin', 'Read Teacher', 'Read Student', 'Read Parent'),
             childItems: [
                 {
                     title: 'Admin',
                     href: route('admins.index'),
                     icon: AppWindow,
                     show: hasPermission('Read Admin'),
-                },
-                {
-                    title: 'Student',
-                    href: route('students.index'),
-                    icon: AppWindow,
-                    show: hasPermission('Read Student'),
                 },
                 {
                     title: 'Teacher',
@@ -68,6 +62,12 @@ const mainNavItems = computed(() => {
                     show: hasPermission('Read Staff'),
                 },
                 {
+                    title: 'Student',
+                    href: route('students.index'),
+                    icon: AppWindow,
+                    show: hasPermission('Read Student'),
+                },
+                {
                     title: 'Parent',
                     href: route('parents.index'),
                     icon: AppWindow,
@@ -79,7 +79,7 @@ const mainNavItems = computed(() => {
             title: 'Setup',
             icon: Settings,
             href: '#',
-            show: hasAnyPermission('Read Class', 'Read Shift', 'Read Group', 'Read Subject', 'Read Syllabus'),
+            show: hasAnyPermission('Read Class', 'Read Shift', 'Read Group', 'Read Subject'),
             childItems: [
                 {
                     title: 'Class',
