@@ -10,7 +10,6 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import AccountLayout from '@/layouts/account/Layout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { DateFormatter, getLocalTimeZone, parseDate, today, isSameDay } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
@@ -24,7 +23,6 @@ import { CalendarRoot, type CalendarRootEmits, type CalendarRootProps, useDateFo
 import { createDecade, createYear, toDate } from 'reka-ui/date'
 import { type HTMLAttributes } from 'vue'
 
-type Gender = 'Male' | 'Female' | 'Other' | null;
 type BloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | null;
 type Religion = 'Islam' | 'Hinduism' | 'Christianity' | 'Buddhism' | 'Other' | null;
 type MaritalStatus = 'Single' | 'Married' | 'Divorced' | 'Widowed' | 'Separated' | 'Other' | null;
@@ -33,7 +31,6 @@ interface ProfileForm {
     profile_photo: File | null;
     name: string;
     email: string;
-    gender: Gender;
     date_of_birth: string | null;
     blood_group: BloodGroup;
     religion: Religion;
@@ -107,7 +104,6 @@ const form = useForm<ProfileForm>({
     profile_photo: null,
     name: user.name,
     email: user.email,
-    gender: user.gender as Gender,
     date_of_birth: user.date_of_birth,
     blood_group: user.blood_group as BloodGroup,
     religion: user.religion as Religion,
@@ -186,25 +182,6 @@ const submit = () => {
                         <Label for="email">Email address</Label>
                         <Input id="email" type="email" class="mt-1 block w-full" v-model="form.email" placeholder="Email address" />
                         <InputError class="mt-2" :message="form.errors.email" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="gender">Gender</Label>
-                        <RadioGroup v-model="form.gender" class="grid grid-cols-3 gap-4 mt-1">
-                            <div class="flex items-center space-x-2">
-                                <RadioGroupItem id="male" value="Male" />
-                                <Label for="male">Male</Label>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <RadioGroupItem id="female" value="Female" />
-                                <Label for="female">Female</Label>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <RadioGroupItem id="other" value="Other" />
-                                <Label for="other">Other</Label>
-                            </div>
-                        </RadioGroup>
-                        <InputError class="mt-2" :message="form.errors.gender" />
                     </div>
 
                     <div class="grid gap-2">
@@ -355,18 +332,6 @@ const submit = () => {
                             </SelectContent>
                         </Select>
                         <InputError class="mt-2" :message="form.errors.marital_status" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="phone">Phone</Label>
-                        <Input id="phone" class="mt-1 block w-full" v-model="form.phone" placeholder="Phone" />
-                        <InputError class="mt-2" :message="form.errors.phone" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="present_address">Present Address</Label>
-                        <Textarea v-model="form.present_address" placeholder="Enter your present address" />
-                        <InputError class="mt-2" :message="form.errors.present_address" />
                     </div>
 
                     <div class="grid gap-2">

@@ -27,6 +27,9 @@ class AdminController extends Controller
             'role_ids.*' => 'exists:roles,id',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
+            'gender' => 'required|in:Male,Female,Other',
+            'phone' => 'required|string|max:15',
+            'present_address' => 'required|string|max:255',
             'password' => 'required|string|min:8',
             'status' => 'required|in:Active,Inactive,Suspended',
         ]);
@@ -49,9 +52,12 @@ class AdminController extends Controller
             'role_ids.*' => 'exists:roles,id',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'gender' => 'required|in:Male,Female,Other',
+            'phone' => 'required|string|max:15',
+            'present_address' => 'required|string|max:255',
             'status' => 'required|in:Active,Inactive,Suspended',
         ]);
-        
+
         $user->update($validated);
         $user->roles()->sync($request->role_ids);
 

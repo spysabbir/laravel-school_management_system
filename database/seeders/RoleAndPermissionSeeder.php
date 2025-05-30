@@ -23,6 +23,8 @@ class RoleAndPermissionSeeder extends Seeder
         $roles = [
             'Super Admin',
             'Admin',
+            'Student',
+            'Parent',
         ];
 
         foreach ($roles as $role) {
@@ -33,9 +35,6 @@ class RoleAndPermissionSeeder extends Seeder
         $permissions = [
             'Roles And Permissions Management' => [
                 'Read Roles And Permissions', 'Create Roles', 'Delete Roles', 'Assign Roles And Permissions', 'Revoke Roles And Permissions'
-            ],
-            'Users Management' => [
-                'Read Users', 'Create Users', 'Delete Users', 'Update Users'
             ],
         ];
 
@@ -49,7 +48,6 @@ class RoleAndPermissionSeeder extends Seeder
         $assign = [
             'Admin' => [
                 'Roles And Permissions Management' => ['Read Roles And Permissions'],
-                'Users Management' => ['Read Users', 'Create Users', 'Delete Users', 'Update Users'],
             ],
         ];
 
