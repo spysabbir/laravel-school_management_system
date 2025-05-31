@@ -254,7 +254,7 @@ const submit = () => {
                                         <SelectContent>
                                             <SelectGroup>
                                                 <SelectLabel>Roles</SelectLabel>
-                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.id.toString()">
+                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.id.toString()" :disabled="['Admin', 'Super Admin', 'Student', 'Parent'].includes(role.name)">
                                                     {{ role.name }}
                                                 </SelectItem>
                                             </SelectGroup>

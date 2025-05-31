@@ -24,29 +24,26 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-            'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
-            'date_of_birth' => ['nullable', 'date'],
             'blood_group' => ['nullable', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
-            'religion' => ['nullable', 'string', 'in:Islam,Hinduism,Christianity,Buddhism,Other'],
             'marital_status' => ['nullable', 'string', 'in:Single,Married,Divorced,Widowed,Separated,Other'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'present_address' => ['nullable', 'string', 'max:500'],
             'permanent_address' => ['nullable', 'string', 'max:500'],
         ]);
 
+        if (!$request->hasFile('profile_photo')) {
+            $validated['profile_photo'] = $user->profile_photo ?? 'default_profile_photo.png';
+        }
+
         if ($request->hasFile('profile_photo')) {
-            // Delete old profile photo if exists
-            if ($user->profile_photo) {
+            if ($user->profile_photo && $user->profile_photo !== 'default_profile_photo.png') {
                 $oldProfilePhoto = public_path('uploads/profile_photos/') . $user->profile_photo;
                 if (file_exists($oldProfilePhoto)) {
                     unlink($oldProfilePhoto);
                 }
             }
 
-            // Process new profile photo
             $extension = $request->file('profile_photo')->getClientOriginalExtension();
             $filename = $user->id . '_profile_photo.' . $extension;
 

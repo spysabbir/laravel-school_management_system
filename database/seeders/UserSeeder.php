@@ -17,6 +17,11 @@ class UserSeeder extends Seeder
         $superAdmin = User::create([
             'name' => 'Super Admin',
             'email' => 'superadmin@email.com',
+            'gender' => 'Male',
+            'date_of_birth' => '2025-05-11',
+            'religion' => 'Islam',
+            'phone' => '1234567890',
+            'present_address' => '123 Main St, City, Country',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
             'type' => 'Admin',
@@ -27,6 +32,11 @@ class UserSeeder extends Seeder
         $admin = User::create([
             'name' => 'Admin',
             'email' => 'admin@email.com',
+            'gender' => 'Male',
+            'date_of_birth' => '2025-05-11',
+            'religion' => 'Islam',
+            'phone' => '1234567890',
+            'present_address' => '123 Main St, City, Country',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
             'type' => 'Admin',

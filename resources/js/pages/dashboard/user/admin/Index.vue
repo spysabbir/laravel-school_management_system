@@ -153,6 +153,7 @@ const form = useForm<{
     email: string;
     date_of_birth?: string;
     gender?: string;
+    religion?: string;
     phone?: string;
     present_address?: string;
     password: string;
@@ -163,6 +164,7 @@ const form = useForm<{
     email: '',
     date_of_birth: '',
     gender: '',
+    religion: '',
     phone: '',
     present_address: '',
     password: '',
@@ -183,10 +185,11 @@ const openEditDialog = (user: User) => {
     form.role_ids = user.roles.map(role => role.id.toString());
     form.name = user.name;
     form.email = user.email;
-    form.date_of_birth = user.date_of_birth;
-    form.gender = user.gender;
-    form.phone = user.phone;
-    form.present_address = user.present_address;
+    form.date_of_birth = user.date_of_birth ?? '';
+    form.gender = user.gender ?? '';
+    form.religion = user.religion ?? '';
+    form.phone = user.phone != null ? String(user.phone) : '';
+    form.present_address = user.present_address ?? '';
     form.status = user.status;
     form.clearErrors();
     editingUser.value = user;
@@ -268,7 +271,7 @@ const submit = () => {
                                         <SelectContent>
                                             <SelectGroup>
                                                 <SelectLabel>Roles</SelectLabel>
-                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.id.toString()">
+                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.id.toString()" :disabled="!['Admin', 'Super Admin'].includes(role.name)">
                                                     {{ role.name }}
                                                 </SelectItem>
                                             </SelectGroup>
@@ -291,7 +294,7 @@ const submit = () => {
 
                                 <div class="grid gap-2">
                                     <Label for="date_of_birth">Date of Birth</Label>
-                                    <Input id="date_of_birth" type="date" v-model="form.date_of_birth" />
+                                    <Input id="date_of_birth" type="date" v-model="form.date_of_birth" :max="new Date().toISOString().split('T')[0]" />
                                     <InputError :message="form.errors.date_of_birth" />
                                 </div>
 
@@ -312,6 +315,26 @@ const submit = () => {
                                         </div>
                                     </RadioGroup>
                                     <InputError class="mt-2" :message="form.errors.gender" />
+                                </div>
+
+                                <div class="grid gap-2">
+                                    <Label for="religion">Religion</Label>
+                                    <Select v-model="form.religion">
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a religion" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Religion</SelectLabel>
+                                                <SelectItem value="Islam">Islam</SelectItem>
+                                                <SelectItem value="Hinduism">Hinduism</SelectItem>
+                                                <SelectItem value="Christianity">Christianity</SelectItem>
+                                                <SelectItem value="Buddhism">Buddhism</SelectItem>
+                                                <SelectItem value="Other">Other</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError class="mt-2" :message="form.errors.religion" />
                                 </div>
 
                                 <div class="grid gap-2">

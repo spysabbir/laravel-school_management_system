@@ -9,63 +9,24 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AccountLayout from '@/layouts/account/Layout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { DateFormatter, getLocalTimeZone, parseDate, today, isSameDay } from '@internationalized/date'
-import { CalendarIcon } from 'lucide-vue-next'
+import { ref, onUnmounted } from 'vue';
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'vue-sonner'
 
-import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading } from '@/components/ui/calendar'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useVModel } from '@vueuse/core'
-import { CalendarRoot, type CalendarRootEmits, type CalendarRootProps, useDateFormatter, useForwardPropsEmits } from 'reka-ui'
-import { createDecade, createYear, toDate } from 'reka-ui/date'
-import { type HTMLAttributes } from 'vue'
 
 type BloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | null;
-type Religion = 'Islam' | 'Hinduism' | 'Christianity' | 'Buddhism' | 'Other' | null;
 type MaritalStatus = 'Single' | 'Married' | 'Divorced' | 'Widowed' | 'Separated' | 'Other' | null;
 
 interface ProfileForm {
     profile_photo: File | null;
     name: string;
     email: string;
-    date_of_birth: string | null;
     blood_group: BloodGroup;
-    religion: Religion;
     marital_status: MaritalStatus;
-    phone: string | null;
-    present_address: string | null;
     permanent_address: string | null;
     _method: string;
 }
-
-const df = new DateFormatter('en-US', {
-    dateStyle: 'long',
-});
-
-const calendarProps = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(), {
-    modelValue: undefined,
-    placeholder: () => today(getLocalTimeZone()),
-    weekdayFormat: 'short',
-});
-
-const calendarEmits = defineEmits<CalendarRootEmits>();
-
-const delegatedProps = computed(() => {
-    const { class: _, placeholder: __, ...delegated } = calendarProps;
-    return delegated;
-});
-
-const dateValue = useVModel(calendarProps, 'modelValue', calendarEmits, {
-    passive: true,
-    defaultValue: today(getLocalTimeZone()),
-});
-
-const forwarded = useForwardPropsEmits(delegatedProps, calendarEmits);
-const formatter = useDateFormatter('en');
-
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -104,20 +65,10 @@ const form = useForm<ProfileForm>({
     profile_photo: null,
     name: user.name,
     email: user.email,
-    date_of_birth: user.date_of_birth,
     blood_group: user.blood_group as BloodGroup,
-    religion: user.religion as Religion,
     marital_status: user.marital_status as MaritalStatus,
-    phone: user.phone,
-    present_address: user.present_address,
     permanent_address: user.permanent_address,
     _method: 'PATCH',
-});
-
-onMounted(() => {
-    dateValue.value = user.date_of_birth
-        ? parseDate(user.date_of_birth)
-        : today(getLocalTimeZone());
 });
 
 onUnmounted(() => {
@@ -125,7 +76,6 @@ onUnmounted(() => {
 });
 
 const submit = () => {
-    form.date_of_birth = dateValue.value ? dateValue.value.toString() : null;
     form.profile_photo = newProfilePhotoFile.value;
 
     form.post(route('profile.update'), {
@@ -204,113 +154,6 @@ const submit = () => {
                             </SelectContent>
                         </Select>
                         <InputError class="mt-2" :message="form.errors.blood_group" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="date_of_birth">Date Of Birth</Label>
-                        <Popover>
-                            <PopoverTrigger as-child>
-                                <Button variant="outline" class="w-full justify-start text-left font-normal">
-                                    <CalendarIcon class="mr-2 h-4 w-4" />
-                                    {{ dateValue ? df.format(dateValue.toDate(getLocalTimeZone())) : "Pick a date" }}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent class="w-auto p-0">
-                                <CalendarRoot v-slot="{ date, grid, weekDays }" v-model="dateValue" v-bind="forwarded" class="rounded-md border p-3" :max-value="today(getLocalTimeZone())" >
-                                    <CalendarHeader>
-                                        <CalendarHeading class="flex w-full items-center justify-between gap-2">
-                                            <Select :model-value="dateValue?.month.toString()"
-                                                @update:model-value="(v) => {
-                                                    if (!v || !dateValue) return;
-                                                    try {
-                                                        let newDate = dateValue.set({ month: Number(v) });
-                                                        if (newDate.compare(today(getLocalTimeZone())) > 0) {
-                                                            newDate = today(getLocalTimeZone());
-                                                        }
-                                                        dateValue = newDate;
-                                                    } catch (e) {
-                                                        dateValue = dateValue.set({ month: Number(v) });
-                                                    }
-                                                }"
-                                            >
-                                                <SelectTrigger aria-label="Select month" class="w-[60%]">
-                                                    <SelectValue placeholder="Select month" />
-                                                </SelectTrigger>
-                                                <SelectContent class="max-h-[200px]">
-                                                    <SelectItem v-for="month in createYear({ dateObj: date })" :key="month.toString()" :value="month.month.toString()" >
-                                                        {{ formatter.custom(toDate(month), { month: 'long' }) }}
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-
-                                            <Select :model-value="dateValue?.year.toString()"
-                                                @update:model-value="(v) => {
-                                                    if (!v || !dateValue) return;
-                                                    try {
-                                                        let newDate = dateValue.set({ year: Number(v) });
-                                                        if (newDate.compare(today(getLocalTimeZone())) > 0) {
-                                                            newDate = today(getLocalTimeZone());
-                                                        }
-                                                        dateValue = newDate;
-                                                    } catch (e) {
-                                                        dateValue = dateValue.set({ year: Number(v) });
-                                                    }
-                                                }"
-                                            >
-                                                <SelectTrigger aria-label="Select year" class="w-[40%]">
-                                                    <SelectValue placeholder="Select year" />
-                                                </SelectTrigger>
-                                                <SelectContent class="max-h-[200px]">
-                                                    <SelectItem v-for="yearValue in createDecade({ dateObj: date, startIndex: -100, endIndex: 0 })" :key="yearValue.toString()" :value="yearValue.year.toString()">
-                                                        {{ yearValue.year }}
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </CalendarHeading>
-                                    </CalendarHeader>
-
-                                    <div class="flex flex-col space-y-4 pt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
-                                        <CalendarGrid v-for="month in grid" :key="month.value.toString()">
-                                            <CalendarGridHead>
-                                                <CalendarGridRow>
-                                                    <CalendarHeadCell v-for="day in weekDays" :key="day">
-                                                        {{ day }}
-                                                    </CalendarHeadCell>
-                                                </CalendarGridRow>
-                                            </CalendarGridHead>
-                                            <CalendarGridBody class="grid">
-                                                <CalendarGridRow v-for="(weekDates, index) in month.rows" :key="`weekDate-${index}`" class="mt-2 w-full">
-                                                    <CalendarCell v-for="weekDate in weekDates" :key="weekDate.toString()" :date="weekDate" :is-disabled="weekDate.compare(today(getLocalTimeZone())) > 0" >
-                                                        <CalendarCellTrigger :day="weekDate" :month="month.value" :is-selected="dateValue ? isSameDay(weekDate, dateValue) : false" />
-                                                    </CalendarCell>
-                                                </CalendarGridRow>
-                                            </CalendarGridBody>
-                                        </CalendarGrid>
-                                    </div>
-                                </CalendarRoot>
-                            </PopoverContent>
-                        </Popover>
-                        <InputError class="mt-2" :message="form.errors.date_of_birth" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="religion">Religion</Label>
-                        <Select v-model="form.religion">
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a religion" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Religion</SelectLabel>
-                                    <SelectItem value="Islam">Islam</SelectItem>
-                                    <SelectItem value="Hinduism">Hinduism</SelectItem>
-                                    <SelectItem value="Christianity">Christianity</SelectItem>
-                                    <SelectItem value="Buddhism">Buddhism</SelectItem>
-                                    <SelectItem value="Other">Other</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        <InputError class="mt-2" :message="form.errors.religion" />
                     </div>
 
                     <div class="grid gap-2">
