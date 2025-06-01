@@ -6,9 +6,11 @@ import { Plus, Trash, Edit } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 import { ColumnDef } from '@tanstack/vue-table';
 import DataTableHeader from '@/components/data-table/DataTableHeader.vue';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button';
 import DataTable from '../../../../components/data-table/DataTable.vue';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -138,11 +140,21 @@ const columns: ColumnDef<User>[] = [
 const form = useForm<{
     name: string;
     email: string;
+    date_of_birth?: string;
+    gender?: string;
+    religion?: string;
+    phone?: string;
+    present_address?: string;
     password: string;
     status?: string;
 }>({
     name: '',
     email: '',
+    date_of_birth: '',
+    gender: '',
+    religion: '',
+    phone: '',
+    present_address: '',
     password: '',
     status: 'Active',
 });
@@ -160,6 +172,11 @@ const openCreateDialog = () => {
 const openEditDialog = (user: User) => {
     form.name = user.name;
     form.email = user.email;
+    form.date_of_birth = user.date_of_birth ?? '';
+    form.gender = user.gender ?? '';
+    form.religion = user.religion ?? '';
+    form.phone = user.phone != null ? String(user.phone) : '';
+    form.present_address = user.present_address ?? '';
     form.status = user.status;
     form.clearErrors();
     editingUser.value = user;
@@ -223,9 +240,9 @@ const submit = () => {
                             <Plus class="h-4 w-4" /> New User ( Student )
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogScrollContent class="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>{{ editingUser ? 'Edit' : 'Create' }} User</DialogTitle>
+                            <DialogTitle>{{ editingUser ? 'Edit' : 'Create' }} User ( Student )</DialogTitle>
                             <DialogDescription>
                                 {{ editingUser ? 'Edit' : 'Create' }} an user to manage your users effectively.
                             </DialogDescription>
@@ -242,6 +259,63 @@ const submit = () => {
                                     <Label for="email">Email</Label>
                                     <Input id="email" type="email" v-model="form.email" placeholder="Email" />
                                     <InputError :message="form.errors.email" />
+                                </div>
+
+                                <div class="grid gap-2">
+                                    <Label for="date_of_birth">Date of Birth</Label>
+                                    <Input id="date_of_birth" type="date" v-model="form.date_of_birth" :max="new Date().toISOString().split('T')[0]" />
+                                    <InputError :message="form.errors.date_of_birth" />
+                                </div>
+
+                                <div class="grid gap-2">
+                                    <Label for="gender">Gender</Label>
+                                    <RadioGroup v-model="form.gender" class="grid grid-cols-3 gap-4 mt-1">
+                                        <div class="flex items-center space-x-2">
+                                            <RadioGroupItem id="male" value="Male" />
+                                            <Label for="male">Male</Label>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <RadioGroupItem id="female" value="Female" />
+                                            <Label for="female">Female</Label>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <RadioGroupItem id="other" value="Other" />
+                                            <Label for="other">Other</Label>
+                                        </div>
+                                    </RadioGroup>
+                                    <InputError class="mt-2" :message="form.errors.gender" />
+                                </div>
+
+                                <div class="grid gap-2">
+                                    <Label for="religion">Religion</Label>
+                                    <Select v-model="form.religion">
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a religion" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Religion</SelectLabel>
+                                                <SelectItem value="Islam">Islam</SelectItem>
+                                                <SelectItem value="Hinduism">Hinduism</SelectItem>
+                                                <SelectItem value="Christianity">Christianity</SelectItem>
+                                                <SelectItem value="Buddhism">Buddhism</SelectItem>
+                                                <SelectItem value="Other">Other</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError class="mt-2" :message="form.errors.religion" />
+                                </div>
+
+                                <div class="grid gap-2">
+                                    <Label for="phone">Phone</Label>
+                                    <Input id="phone" class="mt-1 block w-full" v-model="form.phone" placeholder="Phone" />
+                                    <InputError class="mt-2" :message="form.errors.phone" />
+                                </div>
+
+                                <div class="grid gap-2">
+                                    <Label for="present_address">Present Address</Label>
+                                    <Textarea v-model="form.present_address" placeholder="Enter your present address" />
+                                    <InputError class="mt-2" :message="form.errors.present_address" />
                                 </div>
 
                                 <div v-if="!editingUser" class="grid gap-2">
@@ -270,7 +344,7 @@ const submit = () => {
 
                                 <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                                    {{ editingUser ? 'Edit' : 'Create' }} User
+                                    {{ editingUser ? 'Edit' : 'Create' }} User ( Student )
                                 </Button>
                             </div>
                         </form>
@@ -281,7 +355,7 @@ const submit = () => {
                                 </Button>
                             </DialogClose>
                         </DialogFooter>
-                    </DialogContent>
+                    </DialogScrollContent>
                 </Dialog>
             </div>
 

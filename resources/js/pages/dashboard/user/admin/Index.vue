@@ -255,7 +255,7 @@ const submit = () => {
                     </DialogTrigger>
                     <DialogScrollContent class="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>{{ editingUser ? 'Edit' : 'Create' }} User</DialogTitle>
+                            <DialogTitle>{{ editingUser ? 'Edit' : 'Create' }} User ( Admin )</DialogTitle>
                             <DialogDescription>
                                 {{ editingUser ? 'Edit' : 'Create' }} an user to manage your users effectively.
                             </DialogDescription>
@@ -375,7 +375,7 @@ const submit = () => {
 
                                 <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                                    {{ editingUser ? 'Edit' : 'Create' }} User
+                                    {{ editingUser ? 'Edit' : 'Create' }} User ( Admin )
                                 </Button>
                             </div>
                         </form>

@@ -11,7 +11,8 @@ class Staff extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
+        'user_id',
+        'designation_id',
         'status',
         'created_by',
         'updated_by',
@@ -31,5 +32,10 @@ class Staff extends Model
     public function deletedBy()
     {
         return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    public function designation()
+    {
+        return $this->belongsTo(Designation::class);
     }
 }

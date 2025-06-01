@@ -5,7 +5,7 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type Auth } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Settings, AppWindow, MailCheck, MessageSquareMore, CreditCard, LayoutGrid, Lock, Users } from 'lucide-vue-next';
+import { Settings, Wrench, GraduationCap, FolderTree, Banknote, ListChecks, ChartBarStacked, BookOpenCheck, DollarSign, School, Component, BookCopy, BellElectric, AppWindow, MailCheck, MessageSquareMore, CircleDollarSign, LayoutGrid, Lock, Users, UserPen, UserCog, BookUser, UserSearch, UserCheck } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import { computed } from 'vue';
 
@@ -46,103 +46,109 @@ const mainNavItems = computed(() => {
                 {
                     title: 'Admin',
                     href: route('admins.index'),
-                    icon: AppWindow,
+                    icon: UserCheck,
                     show: hasPermission('Read Admin'),
                 },
                 {
                     title: 'Teacher',
                     href: route('teachers.index'),
-                    icon: AppWindow,
+                    icon: UserPen,
                     show: hasPermission('Read Teacher'),
                 },
                 {
                     title: 'Staff',
                     href: route('staffs.index'),
-                    icon: AppWindow,
+                    icon: UserCog,
                     show: hasPermission('Read Staff'),
                 },
                 {
                     title: 'Student',
                     href: route('students.index'),
-                    icon: AppWindow,
+                    icon: BookUser,
                     show: hasPermission('Read Student'),
                 },
                 {
                     title: 'Parent',
                     href: route('parents.index'),
-                    icon: AppWindow,
+                    icon: UserSearch,
                     show: hasPermission('Read Parent'),
                 },
             ],
         },
         {
             title: 'Setup',
-            icon: Settings,
+            icon: Wrench,
             href: '#',
             show: hasAnyPermission('Read Class', 'Read Shift', 'Read Group', 'Read Subject'),
             childItems: [
                 {
                     title: 'Class',
                     href: route('classes.index'),
-                    icon: AppWindow,
+                    icon: School,
                     show: hasPermission('Read Class'),
                 },
                 {
                     title: 'Shift',
                     href: route('shifts.index'),
-                    icon: AppWindow,
+                    icon: BellElectric,
                     show: hasPermission('Read Shift'),
                 },
                 {
                     title: 'Group',
                     href: route('groups.index'),
-                    icon: AppWindow,
+                    icon: Component,
                     show: hasPermission('Read Group'),
                 },
                 {
                     title: 'Subject',
                     href: route('subjects.index'),
-                    icon: AppWindow,
+                    icon: BookCopy,
                     show: hasPermission('Read Subject'),
-                }
+                },
+                {
+                    title: 'Designation',
+                    href: route('designations.index'),
+                    icon: FolderTree,
+                    show: hasPermission('Read Designation'),
+                },
             ],
         },
         {
             title: 'Academic',
-            icon: Settings,
+            icon: GraduationCap,
             href: '#',
             show: hasAnyPermission('Read Attendance', 'Read Routine'),
             childItems: [
                 {
                     title: 'Attendance',
                     href: route('attendances.index'),
-                    icon: AppWindow,
+                    icon: ListChecks,
                     show: hasPermission('Read Attendance'),
                 },
                 {
                     title: 'Routine',
                     href: route('routines.index'),
-                    icon: AppWindow,
+                    icon: BookOpenCheck,
                     show: hasPermission('Read Routine'),
                 },
             ],
         },
         {
             title: 'Expense',
-            icon: Settings,
+            icon: CircleDollarSign,
             href: '#',
             show: hasAnyPermission('Read Expense Category', 'Read Expense'),
             childItems: [
                 {
                     title: 'Expense Category',
                     href: route('expense-categories.index'),
-                    icon: AppWindow,
+                    icon: ChartBarStacked,
                     show: hasPermission('Read Expense Category'),
                 },
                 {
                     title: 'Expense',
                     href: route('expenses.index'),
-                    icon: AppWindow,
+                    icon: DollarSign,
                     show: hasPermission('Read Expense'),
                 }
             ],
@@ -179,7 +185,7 @@ const footerNavItems = computed(() => {
                 {
                     title: 'Payment Setting',
                     href: route('payment.setting'),
-                    icon: CreditCard,
+                    icon: Banknote,
                     show: hasPermission('setting.payment'),
                 },
             ],

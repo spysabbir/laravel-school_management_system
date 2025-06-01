@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\RoleAndPermissionController;
+use App\Http\Controllers\Dashboard\RoutineController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\User\AdminController;
 use App\Http\Controllers\Dashboard\User\TeacherController;
@@ -10,8 +11,10 @@ use App\Http\Controllers\Dashboard\User\StudentController;
 use App\Http\Controllers\Dashboard\User\ParentController;
 use App\Http\Controllers\Dashboard\Account\PasswordController;
 use App\Http\Controllers\Dashboard\Account\ProfileController;
+use App\Http\Controllers\Dashboard\AttendanceController;
 use App\Http\Controllers\Dashboard\SettingController;
 use App\Http\Controllers\Dashboard\ClasseController;
+use App\Http\Controllers\Dashboard\DesignationController;
 use App\Http\Controllers\Dashboard\ExamController;
 use App\Http\Controllers\Dashboard\ExpenseCategoryController;
 use App\Http\Controllers\Dashboard\ExpenseController;
@@ -46,8 +49,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('classes', ClasseController::class)->except(['show']);
     Route::resource('shifts', ShiftController::class)->except(['show']);
     Route::resource('groups', GroupController::class)->except(['show']);
-    Route::resource('attendances', GroupController::class)->except(['show']);
-    Route::resource('routines', GroupController::class)->except(['show']);
+    Route::resource('attendances', AttendanceController::class)->except(['show']);
+    Route::resource('routines', RoutineController::class)->except(['show']);
+    Route::resource('designations', DesignationController::class)->except(['show']);
 
     Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show']);
     Route::resource('expenses', ExpenseController::class)->except(['show']);

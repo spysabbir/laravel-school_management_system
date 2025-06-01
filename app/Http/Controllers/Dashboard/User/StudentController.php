@@ -24,6 +24,11 @@ class StudentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|in:Male,Female,Other',
+            'religion' => 'required|in:Islam,Christianity,Hinduism,Buddhism,Other',
+            'phone' => 'required|string|max:15',
+            'present_address' => 'required|string|max:255',
             'password' => 'required|string|min:8',
             'status' => 'required|in:Active,Inactive,Suspended',
         ]);
@@ -45,6 +50,11 @@ class StudentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|in:Male,Female,Other',
+            'religion' => 'required|in:Islam,Christianity,Hinduism,Buddhism,Other',
+            'phone' => 'required|string|max:15',
+            'present_address' => 'required|string|max:255',
             'status' => 'required|in:Active,Inactive,Suspended',
         ]);
 
