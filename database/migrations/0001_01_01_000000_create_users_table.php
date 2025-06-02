@@ -27,7 +27,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('status', ['Active', 'Inactive', 'Suspended'])->default('Active');
-            $table->enum('type', ['Admin', 'Teacher', 'Staff', 'Student', 'Parent']);
+            $table->enum('type', ['Admin', 'Teacher', 'Staff', 'Student', 'Guardian']);
             $table->rememberToken();
             $table->timestamps();
         });

@@ -8,7 +8,7 @@ use App\Http\Controllers\Dashboard\User\AdminController;
 use App\Http\Controllers\Dashboard\User\TeacherController;
 use App\Http\Controllers\Dashboard\User\StaffController;
 use App\Http\Controllers\Dashboard\User\StudentController;
-use App\Http\Controllers\Dashboard\User\ParentController;
+use App\Http\Controllers\Dashboard\User\GuardianController;
 use App\Http\Controllers\Dashboard\Account\PasswordController;
 use App\Http\Controllers\Dashboard\Account\ProfileController;
 use App\Http\Controllers\Dashboard\AttendanceController;
@@ -44,7 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('teachers', TeacherController::class);
     Route::resource('staffs', StaffController::class);
     Route::resource('students', StudentController::class);
-    Route::resource('parents', ParentController::class);
+    Route::resource('guardians', GuardianController::class);
 
     Route::resource('classes', ClasseController::class)->except(['show']);
     Route::resource('shifts', ShiftController::class)->except(['show']);

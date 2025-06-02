@@ -9,12 +9,12 @@ use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
-class ParentController extends Controller
+class GuardianController extends Controller
 {
     public function index()
     {
-        $users = User::where('type', 'Parent')->get();
-        return Inertia::render('dashboard/user/parent/Index', [
+        $users = User::where('type', 'Guardian')->get();
+        return Inertia::render('dashboard/user/guardian/Index', [
             'users' => $users,
         ]);
     }
@@ -34,10 +34,10 @@ class ParentController extends Controller
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
-        $validated['type'] = 'Parent';
+        $validated['type'] = 'Guardian';
 
         $user = User::create($validated);
-        $user->roles()->sync(Role::whereIn('name', ['Parent'])->pluck('id')->toArray());
+        $user->roles()->sync(Role::whereIn('name', ['Guardian'])->pluck('id')->toArray());
 
         return back()->with('success', 'User created successfully.');
     }

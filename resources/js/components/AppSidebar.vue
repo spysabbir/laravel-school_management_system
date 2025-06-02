@@ -41,7 +41,7 @@ const mainNavItems = computed(() => {
             title: 'User',
             icon: Users,
             href: '#',
-            show: hasAnyPermission('Read Admin', 'Read Teacher', 'Read Student', 'Read Parent'),
+            show: hasAnyPermission('Read Admin', 'Read Teacher', 'Read Student', 'Read Guardian'),
             childItems: [
                 {
                     title: 'Admin',
@@ -68,10 +68,10 @@ const mainNavItems = computed(() => {
                     show: hasPermission('Read Student'),
                 },
                 {
-                    title: 'Parent',
-                    href: route('parents.index'),
+                    title: 'Guardian',
+                    href: route('guardians.index'),
                     icon: UserSearch,
-                    show: hasPermission('Read Parent'),
+                    show: hasPermission('Read Guardian'),
                 },
             ],
         },

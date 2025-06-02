@@ -24,7 +24,7 @@ class RoleAndPermissionSeeder extends Seeder
             'Super Admin',
             'Admin',
             'Student',
-            'Parent',
+            'Guardian',
         ];
 
         foreach ($roles as $role) {

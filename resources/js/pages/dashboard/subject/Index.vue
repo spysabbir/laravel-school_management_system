@@ -294,28 +294,28 @@ const submit = () => {
                                 <div class="grid gap-2">
                                     <Label for="group_id">Group</Label>
                                     <Select
-    id="group_id"
-    v-model="form.group_id"
-    :disabled="!form.class_id || filteredGroups.length === 0"
->
-    <SelectTrigger class="w-full">
-        <SelectValue
-            :placeholder="!form.class_id ? 'Select class first' : (filteredGroups.length === 0 ? 'No groups available' : 'Select a group')"
-        />
-    </SelectTrigger>
-    <SelectContent>
-        <SelectGroup v-if="filteredGroups.length">
-            <SelectLabel>Groups</SelectLabel>
-            <SelectItem
-                v-for="group in filteredGroups"
-                :key="group.id"
-                :value="group.id"
-            >
-                {{ group.name }}
-            </SelectItem>
-        </SelectGroup>
-    </SelectContent>
-</Select>
+                                        id="group_id"
+                                        v-model="form.group_id"
+                                        :disabled="!form.class_id || filteredGroups.length === 0"
+                                    >
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue
+                                                :placeholder="!form.class_id ? 'Select class first' : (filteredGroups.length === 0 ? 'No groups available' : 'Select a group')"
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup v-if="filteredGroups.length">
+                                                <SelectLabel>Groups</SelectLabel>
+                                                <SelectItem
+                                                    v-for="group in filteredGroups"
+                                                    :key="group.id"
+                                                    :value="group.id"
+                                                >
+                                                    {{ group.name }}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
                                     <InputError :message="form.errors.group_id" />
                                 </div>
                                 <div class="grid gap-2">

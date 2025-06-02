@@ -22,8 +22,8 @@ import { h, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'User ( Parent )',
-        href: route('parents.index'),
+        title: 'User ( Guardian )',
+        href: route('guardians.index'),
     },
 ];
 
@@ -184,7 +184,7 @@ const openEditDialog = (user: User) => {
 
 const submit = () => {
     if (editingUser.value) {
-        form.put(route('parents.update', editingUser.value.id), {
+        form.put(route('guardians.update', editingUser.value.id), {
             onSuccess: () => {
                 toast.success('User updated successfully', {
                     description: new Date().toLocaleString(),
@@ -204,7 +204,7 @@ const submit = () => {
             },
         });
     } else {
-        form.post(route('parents.store'), {
+        form.post(route('guardians.store'), {
             onSuccess: () => {
                 toast.success('User created successfully', {
                     description: new Date().toLocaleString(),
@@ -228,7 +228,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="User ( Parent )" />
+    <Head title="User ( Guardian )" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -236,12 +236,12 @@ const submit = () => {
                 <Dialog v-model:open="dialogOpen">
                     <DialogTrigger as-child>
                         <Button @click="openCreateDialog" class="flex items-center gap-2">
-                            <Plus class="h-4 w-4" /> New User ( Parent )
+                            <Plus class="h-4 w-4" /> New User ( Guardian )
                         </Button>
                     </DialogTrigger>
                     <DialogScrollContent class="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>{{ editingUser ? 'Edit' : 'Create' }} User  ( Parent )</DialogTitle>
+                            <DialogTitle>{{ editingUser ? 'Edit' : 'Create' }} User  ( Guardian )</DialogTitle>
                             <DialogDescription>
                                 {{ editingUser ? 'Edit' : 'Create' }} an user to manage your users effectively.
                             </DialogDescription>
@@ -343,7 +343,7 @@ const submit = () => {
 
                                 <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                                    {{ editingUser ? 'Edit' : 'Create' }} User  ( Parent )
+                                    {{ editingUser ? 'Edit' : 'Create' }} User  ( Guardian )
                                 </Button>
                             </div>
                         </form>
