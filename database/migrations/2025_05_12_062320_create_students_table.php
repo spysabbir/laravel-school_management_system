@@ -23,7 +23,16 @@ return new class extends Migration
             $table->string('guardian_phone')->nullable();
             $table->string('guardian_email')->nullable();
             $table->string('guardian_address')->nullable();
-            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->enum('status', ['Running', 'Graduated', 'Transferred', 'Dropped Out', 'Suspended', 'Expelled', 'Deceased'])->default('Running');
+            $table->date('graduation_date')->nullable();
+            $table->date('transfer_date')->nullable();
+            $table->date('dropout_date')->nullable();
+            $table->date('suspension_date')->nullable();
+            $table->string('suspension_reason')->nullable();
+            $table->date('expulsion_date')->nullable();
+            $table->string('expulsion_reason')->nullable();
+            $table->date('deceased_date')->nullable();
+            $table->string('deceased_reason')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');

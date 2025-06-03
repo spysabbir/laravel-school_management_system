@@ -15,7 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('designation_id')->constrained('designations')->onDelete('cascade');
-            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->string('national_id_no')->nullable();
+            $table->date('joining_date')->nullable();
+            $table->enum('type', ['Full Time', 'Part Time', 'Contractual'])->default('Full Time');
+            $table->enum('status', ['Running', 'Resigned', 'Retired', 'Suspended'])->default('Running');
+            $table->date('resignation_date')->nullable();
+            $table->date('retirement_date')->nullable();
+            $table->date('suspension_date')->nullable();
+            $table->text('resignation_reason')->nullable();
+            $table->text('suspension_reason')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');

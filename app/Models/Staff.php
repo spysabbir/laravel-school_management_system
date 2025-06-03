@@ -10,10 +10,20 @@ class Staff extends Model
 {
     use SoftDeletes;
 
+    protected $table = 'staffs';
+
     protected $fillable = [
         'user_id',
         'designation_id',
+        'national_id_no',
+        'joining_date',
+        'type',
         'status',
+        'resignation_date',
+        'retirement_date',
+        'suspension_date',
+        'resignation_reason',
+        'suspension_reason',
         'created_by',
         'updated_by',
         'deleted_by',

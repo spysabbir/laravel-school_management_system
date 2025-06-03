@@ -98,3 +98,15 @@ export interface Expense {
     updated_at: string;
     deleted_at: string | null;
 }
+
+export interface Designation {
+    id: number;
+    name: string;
+    status: string;
+    created_by: number;
+    updated_by: number | null;
+    deleted_by: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+}
