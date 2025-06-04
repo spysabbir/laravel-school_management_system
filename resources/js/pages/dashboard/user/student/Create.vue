@@ -33,11 +33,10 @@ const form = useForm<{
     email: string;
     date_of_birth?: string;
     gender?: string;
+    birth_reg_no?: string;
+    registration_no?: string;
     religion?: string;
     phone?: string;
-    class_id: number | null;
-    group_id: number | null;
-    shift_id?: number | null;
     father_name?: string;
     mother_name?: string;
     guardian_name?: string;
@@ -48,16 +47,29 @@ const form = useForm<{
     present_address?: string;
     password: string;
     status?: string;
+    graduation_date?: string;
+    transfer_date?: string;
+    dropout_date?: string;
+    suspension_date?: string;
+    expulsion_date?: string;
+    transfer_reason?: string;
+    suspension_reason?: string;
+    expulsion_reason?: string;
+    student_type?: 'Regular' | 'Irregular';
+    class_id: number | null;
+    group_id: number | null;
+    shift_id?: number | null;
+    academic_year?: string;
+    type?: 'New' | 'Transfer' | 'Re Admission';
 }>({
     name: '',
     email: '',
     date_of_birth: '',
     gender: '',
+    birth_reg_no: '',
+    registration_no: '',
     religion: '',
     phone: '',
-    class_id: null,
-    group_id: null,
-    shift_id: null,
     father_name: '',
     mother_name: '',
     guardian_name: '',
@@ -67,7 +79,21 @@ const form = useForm<{
     guardian_address: '',
     present_address: '',
     password: '',
-    status: 'Active',
+    status: 'Running',
+    graduation_date: '',
+    transfer_date: '',
+    dropout_date: '',
+    suspension_date: '',
+    expulsion_date: '',
+    transfer_reason: '',
+    suspension_reason: '',
+    expulsion_reason: '',
+    student_type: 'Regular',
+    class_id: null,
+    group_id: null,
+    shift_id: null,
+    academic_year: new Date().toLocaleDateString('en-US', { year: 'numeric' }),
+    type: 'New',
 });
 
 const filteredGroups = computed(() => {
@@ -160,6 +186,18 @@ const submit = () => {
                         </div>
 
                         <div class="grid gap-2">
+                            <Label for="birth_reg_no">Birth Registration No</Label>
+                            <Input id="birth_reg_no" type="text" v-model="form.birth_reg_no" placeholder="Birth Registration No" />
+                            <InputError class="mt-2" :message="form.errors.birth_reg_no" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="registration_no">Registration No</Label>
+                            <Input id="registration_no" type="text" v-model="form.registration_no" placeholder="Registration No" />
+                            <InputError class="mt-2" :message="form.errors.registration_no" />
+                        </div>
+
+                        <div class="grid gap-2">
                             <Label for="religion">Religion</Label>
                             <Select v-model="form.religion">
                                 <SelectTrigger>
@@ -191,7 +229,7 @@ const submit = () => {
                             <InputError class="mt-2" :message="form.errors.present_address" />
                         </div>
 
-                        <div v-if="!editingUser" class="grid gap-2">
+                        <div class="grid gap-2">
                             <Label for="password">Password</Label>
                             <Input id="password" type="password" v-model="form.password" placeholder="Password" />
                             <InputError :message="form.errors.password" />
@@ -262,6 +300,45 @@ const submit = () => {
                         </div>
 
                         <div class="grid gap-2">
+                            <Label>Student Type</Label>
+                            <RadioGroup v-model="form.student_type" class="grid grid-cols-3 gap-4 mt-1">
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="regular" value="Regular" />
+                                    <Label for="regular">Regular</Label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="irregular" value="Irregular" />
+                                    <Label for="irregular">Irregular</Label>
+                                </div>
+                            </RadioGroup>
+                            <InputError class="mt-2" :message="form.errors.student_type" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="academic_year">Academic Year</Label>
+                            <Input id="academic_year" type="text" v-model="form.academic_year" placeholder="Academic Year" />
+                            <InputError :message="form.errors.academic_year" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="type">Type</Label>
+                            <Select id="type" v-model="form.type">
+                                <SelectTrigger class="w-full">
+                                    <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Types</SelectLabel>
+                                        <SelectItem value="New">New</SelectItem>
+                                        <SelectItem value="Transfer">Transfer</SelectItem>
+                                        <SelectItem value="Re Admission">Re Admission</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <InputError :message="form.errors.type" />
+                        </div>
+
+                        <div class="grid gap-2">
                             <Label for="father_name">Father Name</Label>
                             <Input id="father_name" type="text" v-model="form.father_name" placeholder="Father Name" />
                             <InputError class="mt-2" :message="form.errors.father_name" />
@@ -312,18 +389,69 @@ const submit = () => {
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectLabel>Status</SelectLabel>
-                                        <SelectItem value="Active">Active</SelectItem>
-                                        <SelectItem value="Inactive">Inactive</SelectItem>
+                                        <SelectItem value="Running">Running</SelectItem>
+                                        <SelectItem value="Graduated">Graduated</SelectItem>
+                                        <SelectItem value="Transferred">Transferred</SelectItem>
+                                        <SelectItem value="Dropped Out">Dropped Out</SelectItem>
                                         <SelectItem value="Suspended">Suspended</SelectItem>
+                                        <SelectItem value="Expelled">Expelled</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                             <InputError :message="form.errors.status" />
                         </div>
 
+                        <div class="grid gap-2" v-if="form.status === 'Graduated'">
+                            <Label for="graduation_date">Graduation Date</Label>
+                            <Input id="graduation_date" type="date" v-model="form.graduation_date" :max="new Date().toISOString().split('T')[0]" />
+                            <InputError :message="form.errors.graduation_date" />
+                        </div>
+
+                        <div class="grid gap-2" v-if="form.status === 'Transferred'">
+                            <Label for="transfer_date">Transfer Date</Label>
+                            <Input id="transfer_date" type="date" v-model="form.transfer_date" :max="new Date().toISOString().split('T')[0]" />
+                            <InputError :message="form.errors.transfer_date" />
+                        </div>
+
+                        <div class="grid gap-2" v-if="form.status === 'Dropped Out'">
+                            <Label for="dropout_date">Dropout Date</Label>
+                            <Input id="dropout_date" type="date" v-model="form.dropout_date" :max="new Date().toISOString().split('T')[0]" />
+                            <InputError :message="form.errors.dropout_date" />
+                        </div>
+
+                        <div class="grid gap-2" v-if="form.status === 'Suspended'">
+                            <Label for="suspension_date">Suspension Date</Label>
+                            <Input id="suspension_date" type="date" v-model="form.suspension_date" :max="new Date().toISOString().split('T')[0]" />
+                            <InputError :message="form.errors.suspension_date" />
+                        </div>
+
+                        <div class="grid gap-2" v-if="form.status === 'Expelled'">
+                            <Label for="expulsion_date">Expulsion Date</Label>
+                            <Input id="expulsion_date" type="date" v-model="form.expulsion_date" :max="new Date().toISOString().split('T')[0]" />
+                            <InputError :message="form.errors.expulsion_date" />
+                        </div>
+
+                        <div class="grid gap-2" v-if="form.status === 'Transferred'">
+                            <Label for="transfer_reason">Transfer Reason</Label>
+                            <Textarea id="transfer_reason" v-model="form.transfer_reason" placeholder="Enter transfer reason" />
+                            <InputError :message="form.errors.transfer_reason" />
+                        </div>
+
+                        <div class="grid gap-2" v-if="form.status === 'Suspended'">
+                            <Label for="suspension_reason">Suspension Reason</Label>
+                            <Textarea id="suspension_reason" v-model="form.suspension_reason" placeholder="Enter suspension reason" />
+                            <InputError :message="form.errors.suspension_reason" />
+                        </div>
+
+                        <div class="grid gap-2" v-if="form.status === 'Expelled'">
+                            <Label for="expulsion_reason">Expulsion Reason</Label>
+                            <Textarea id="expulsion_reason" v-model="form.expulsion_reason" placeholder="Enter expulsion reason" />
+                            <InputError :message="form.errors.expulsion_reason" />
+                        </div>
+
                         <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                             <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                            {{ editingUser ? 'Edit' : 'Create' }} User ( Student )
+                            Create User ( Student )
                         </Button>
                     </div>
                 </form>

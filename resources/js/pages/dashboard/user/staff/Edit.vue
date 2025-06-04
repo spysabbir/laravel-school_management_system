@@ -55,7 +55,7 @@ const form = useForm<{
     national_id_no: user.staff?.national_id_no || '',
     joining_date: user.staff?.joining_date || '',
     type: user.staff?.type || 'Full Time',
-    designation_id: user.staff?.designation_id || '',
+    designation_id: user.staff?.designation_id?.toString() || '',
     date_of_birth: user.date_of_birth || '',
     gender: user.gender || '',
     religion: user.religion || '',
@@ -91,7 +91,7 @@ const submit = () => {
 
 <template>
     <Head title="User ( Staff )" />
-    
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="mb-4 flex items-center justify-end">

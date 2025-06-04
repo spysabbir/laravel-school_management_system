@@ -55,7 +55,7 @@ const form = useForm<{
     national_id_no: user.teacher?.national_id_no || '',
     joining_date: user.teacher?.joining_date || '',
     type: user.teacher?.type || 'Full Time',
-    designation_id: user.teacher?.designation_id || '',
+    designation_id: user.teacher?.designation_id?.toString() || '',
     date_of_birth: user.date_of_birth || '',
     gender: user.gender || '',
     religion: user.religion || '',
