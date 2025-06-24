@@ -37,6 +37,14 @@ const form = useForm<{
     registration_no?: string;
     religion?: string;
     phone?: string;
+    present_address?: string;
+    password: string;
+    class_id: number | null;
+    group_id: number | null;
+    shift_id?: number | null;
+    student_type?: 'Regular' | 'Irregular';
+    academic_year?: string;
+    type?: 'New Admission' | 'Transfer Admission' | 'Re Admission';
     father_name?: string;
     mother_name?: string;
     guardian_name?: string;
@@ -44,9 +52,6 @@ const form = useForm<{
     guardian_email?: string;
     guardian_phone?: string;
     guardian_address?: string;
-    present_address?: string;
-    password: string;
-    status?: string;
     graduation_date?: string;
     transfer_date?: string;
     dropout_date?: string;
@@ -55,12 +60,7 @@ const form = useForm<{
     transfer_reason?: string;
     suspension_reason?: string;
     expulsion_reason?: string;
-    student_type?: 'Regular' | 'Irregular';
-    class_id: number | null;
-    group_id: number | null;
-    shift_id?: number | null;
-    academic_year?: string;
-    type?: 'New' | 'Transfer' | 'Re Admission';
+    status?: string;
 }>({
     name: '',
     email: '',
@@ -93,7 +93,7 @@ const form = useForm<{
     group_id: null,
     shift_id: null,
     academic_year: new Date().toLocaleDateString('en-US', { year: 'numeric' }),
-    type: 'New',
+    type: 'New Admission',
 });
 
 const filteredGroups = computed(() => {
@@ -119,9 +119,6 @@ const submit = () => {
                 });
                 form.reset();
                 form.clearErrors();
-                dialogOpen.value = false;
-
-                localUsers.value = props.users.map(user => ({ ...user }));
             },
             onError: (errors) => {
                 if (errors.error) {
@@ -161,12 +158,6 @@ const submit = () => {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="date_of_birth">Date of Birth</Label>
-                            <Input id="date_of_birth" type="date" v-model="form.date_of_birth" :max="new Date().toISOString().split('T')[0]" />
-                            <InputError :message="form.errors.date_of_birth" />
-                        </div>
-
-                        <div class="grid gap-2">
                             <Label for="gender">Gender</Label>
                             <RadioGroup v-model="form.gender" class="grid grid-cols-3 gap-4 mt-1">
                                 <div class="flex items-center space-x-2">
@@ -186,15 +177,9 @@ const submit = () => {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="birth_reg_no">Birth Registration No</Label>
-                            <Input id="birth_reg_no" type="text" v-model="form.birth_reg_no" placeholder="Birth Registration No" />
-                            <InputError class="mt-2" :message="form.errors.birth_reg_no" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="registration_no">Registration No</Label>
-                            <Input id="registration_no" type="text" v-model="form.registration_no" placeholder="Registration No" />
-                            <InputError class="mt-2" :message="form.errors.registration_no" />
+                            <Label for="date_of_birth">Date of Birth</Label>
+                            <Input id="date_of_birth" type="date" v-model="form.date_of_birth" :max="new Date().toISOString().split('T')[0]" />
+                            <InputError :message="form.errors.date_of_birth" />
                         </div>
 
                         <div class="grid gap-2">
@@ -233,6 +218,54 @@ const submit = () => {
                             <Label for="password">Password</Label>
                             <Input id="password" type="password" v-model="form.password" placeholder="Password" />
                             <InputError :message="form.errors.password" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="birth_reg_no">Birth Registration No</Label>
+                            <Input id="birth_reg_no" type="text" v-model="form.birth_reg_no" placeholder="Birth Registration No" />
+                            <InputError class="mt-2" :message="form.errors.birth_reg_no" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="father_name">Father Name</Label>
+                            <Input id="father_name" type="text" v-model="form.father_name" placeholder="Father Name" />
+                            <InputError class="mt-2" :message="form.errors.father_name" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="mother_name">Mother Name</Label>
+                            <Input id="mother_name" type="text" v-model="form.mother_name" placeholder="Mother Name" />
+                            <InputError class="mt-2" :message="form.errors.mother_name" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="guardian_name">Guardian Name</Label>
+                            <Input id="guardian_name" type="text" v-model="form.guardian_name" placeholder="Guardian Name" />
+                            <InputError class="mt-2" :message="form.errors.guardian_name" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="guardian_email">Guardian Email</Label>
+                            <Input id="guardian_email" type="email" v-model="form.guardian_email" placeholder="Guardian Email" />
+                            <InputError class="mt-2" :message="form.errors.guardian_email" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="guardian_phone">Guardian Phone</Label>
+                            <Input id="guardian_phone" type="text" v-model="form.guardian_phone" placeholder="Guardian Phone" />
+                            <InputError class="mt-2" :message="form.errors.guardian_phone" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="guardian_address">Guardian Address</Label>
+                            <Textarea v-model="form.guardian_address" placeholder="Enter guardian address" />
+                            <InputError class="mt-2" :message="form.errors.guardian_address" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="guardian_relation">Guardian Relation</Label>
+                            <Input id="guardian_relation" type="text" v-model="form.guardian_relation" placeholder="Guardian Relation" />
+                            <InputError class="mt-2" :message="form.errors.guardian_relation" />
                         </div>
 
                         <div class="grid gap-2">
@@ -300,21 +333,6 @@ const submit = () => {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label>Student Type</Label>
-                            <RadioGroup v-model="form.student_type" class="grid grid-cols-3 gap-4 mt-1">
-                                <div class="flex items-center space-x-2">
-                                    <RadioGroupItem id="regular" value="Regular" />
-                                    <Label for="regular">Regular</Label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <RadioGroupItem id="irregular" value="Irregular" />
-                                    <Label for="irregular">Irregular</Label>
-                                </div>
-                            </RadioGroup>
-                            <InputError class="mt-2" :message="form.errors.student_type" />
-                        </div>
-
-                        <div class="grid gap-2">
                             <Label for="academic_year">Academic Year</Label>
                             <Input id="academic_year" type="text" v-model="form.academic_year" placeholder="Academic Year" />
                             <InputError :message="form.errors.academic_year" />
@@ -331,7 +349,6 @@ const submit = () => {
                                         <SelectLabel>Types</SelectLabel>
                                         <SelectItem value="New">New</SelectItem>
                                         <SelectItem value="Transfer">Transfer</SelectItem>
-                                        <SelectItem value="Re Admission">Re Admission</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -339,45 +356,18 @@ const submit = () => {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="father_name">Father Name</Label>
-                            <Input id="father_name" type="text" v-model="form.father_name" placeholder="Father Name" />
-                            <InputError class="mt-2" :message="form.errors.father_name" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="mother_name">Mother Name</Label>
-                            <Input id="mother_name" type="text" v-model="form.mother_name" placeholder="Mother Name" />
-                            <InputError class="mt-2" :message="form.errors.mother_name" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="guardian_name">Guardian Name</Label>
-                            <Input id="guardian_name" type="text" v-model="form.guardian_name" placeholder="Guardian Name" />
-                            <InputError class="mt-2" :message="form.errors.guardian_name" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="guardian_relation">Guardian Relation</Label>
-                            <Input id="guardian_relation" type="text" v-model="form.guardian_relation" placeholder="Guardian Relation" />
-                            <InputError class="mt-2" :message="form.errors.guardian_relation" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="guardian_email">Guardian Email</Label>
-                            <Input id="guardian_email" type="email" v-model="form.guardian_email" placeholder="Guardian Email" />
-                            <InputError class="mt-2" :message="form.errors.guardian_email" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="guardian_phone">Guardian Phone</Label>
-                            <Input id="guardian_phone" type="text" v-model="form.guardian_phone" placeholder="Guardian Phone" />
-                            <InputError class="mt-2" :message="form.errors.guardian_phone" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="guardian_address">Guardian Address</Label>
-                            <Textarea v-model="form.guardian_address" placeholder="Enter guardian address" />
-                            <InputError class="mt-2" :message="form.errors.guardian_address" />
+                            <Label>Student Type</Label>
+                            <RadioGroup v-model="form.student_type" class="grid grid-cols-3 gap-4 mt-1">
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="regular" value="Regular" />
+                                    <Label for="regular">Regular</Label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="irregular" value="Irregular" />
+                                    <Label for="irregular">Irregular</Label>
+                                </div>
+                            </RadioGroup>
+                            <InputError class="mt-2" :message="form.errors.student_type" />
                         </div>
 
                         <div class="grid gap-2">

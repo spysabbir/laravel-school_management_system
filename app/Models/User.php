@@ -25,7 +25,6 @@ class User extends Authenticatable
         'gender',
         'blood_group',
         'religion',
-        'marital_status',
         'date_of_birth',
         'phone',
         'present_address',
@@ -59,11 +58,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the teacher associated with the user.
+     * Get the employee associated with the user.
      */
-    public function teacher()
+    public function employee()
     {
-        return $this->hasOne(Teacher::class);
+        return $this->hasOne(Employee::class);
     }
     /**
      * Get the student associated with the user.
@@ -71,12 +70,5 @@ class User extends Authenticatable
     public function student()
     {
         return $this->hasOne(Student::class);
-    }
-    /**
-     * Get the staff associated with the user.
-     */
-    public function staff()
-    {
-        return $this->hasOne(Staff::class);
     }
 }

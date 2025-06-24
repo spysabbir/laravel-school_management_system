@@ -23,7 +23,8 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
 
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::with('permissions')->select('*')->get();
+
         return inertia('dashboard/role-permission/Index', compact('roles'));
     }
 
@@ -55,14 +56,12 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
     {
         $role = Role::findOrFail($id);
         $allPermissions = Permission::all();
-
-        $assignedPermissionIds = $role->getAllPermissions()->pluck('id');
+        $rolePermissions = $role->permissions()->get();
 
         return inertia('dashboard/role-permission/Assign', [
             'role' => $role,
-            'permissions' => $allPermissions->toArray(),
-            // 'assignedPermissions' => $assignedPermissionIds,
-            'assignedPermissions' => $role->permissions->map(fn($permission) => ['id' => $permission->id]),
+            'permissions' => $allPermissions,
+            'rolePermissions' => $rolePermissions,
         ]);
     }
 

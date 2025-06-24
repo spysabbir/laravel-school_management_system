@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem, type Role, type Designation } from '@/types';
+import { type BreadcrumbItem, type Role, type Designation, User } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -16,15 +16,18 @@ import { List } from 'lucide-vue-next';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'User ( Staff )',
-        href: route('staffs.index'),
+        title: 'User ( Employee )',
+        href: route('employees.index'),
     },
 ];
 
-defineProps<{
+const props = defineProps<{
+    user: User;
     roles: Role[];
     designations: Designation[];
 }>();
+
+const user = props.user;
 
 const form = useForm<{
     role_ids: string[];
@@ -39,7 +42,6 @@ const form = useForm<{
     religion?: string;
     phone?: string;
     present_address?: string;
-    password: string;
     status?: string;
     resignation_date?: string;
     retirement_date?: string;
@@ -47,31 +49,30 @@ const form = useForm<{
     resignation_reason?: string;
     suspension_reason?: string;
 }>({
-    role_ids: [],
-    name: '',
-    email: '',
-    national_id_no: '',
-    joining_date: '',
-    type: 'Full Time',
-    designation_id: '',
-    date_of_birth: '',
-    gender: '',
-    religion: '',
-    phone: '',
-    present_address: '',
-    password: '',
-    status: 'Running',
-    resignation_date: '',
-    retirement_date: '',
-    suspension_date: '',
-    resignation_reason: '',
-    suspension_reason: '',
+    role_ids: user.roles.map(role => role.id.toString()),
+    name: user.name || '',
+    email: user.email || '',
+    national_id_no: user.employee?.national_id_no || '',
+    joining_date: user.employee?.joining_date || '',
+    type: user.employee?.type || 'Full Time',
+    designation_id: user.employee?.designation_id?.toString() || '',
+    date_of_birth: user.date_of_birth || '',
+    gender: user.gender || '',
+    religion: user.religion || '',
+    phone: user.phone || '',
+    present_address: user.present_address || '',
+    status: user.employee?.status || 'Running',
+    resignation_date: user.employee?.resignation_date || '',
+    retirement_date: user.employee?.retirement_date || '',
+    suspension_date: user.employee?.suspension_date || '',
+    resignation_reason: user.employee?.resignation_reason || '',
+    suspension_reason: user.employee?.suspension_reason || '',
 });
 
 const submit = () => {
-    form.post(route('staffs.store'), {
+    form.put(route('employees.update', user.id), {
             onSuccess: () => {
-                toast.success('User created successfully', {
+                toast.success('User updated successfully', {
                     description: new Date().toLocaleString(),
                 });
                 form.reset();
@@ -89,12 +90,12 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="User ( Staff )" />
+    <Head title="User ( Employee )" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="mb-4 flex items-center justify-end">
-                <Link :href="route('staffs.index')" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                <Link :href="route('employees.index')" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                     <List />
                 </Link>
             </div>
@@ -238,12 +239,6 @@ const submit = () => {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="password">Password</Label>
-                            <Input id="password" type="password" v-model="form.password" placeholder="Password" />
-                            <InputError :message="form.errors.password" />
-                        </div>
-
-                        <div class="grid gap-2">
                             <Label>Status</Label>
                             <Select v-model="form.status">
                                 <SelectTrigger class="w-full">
@@ -294,7 +289,7 @@ const submit = () => {
 
                         <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                             <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                            Create User ( Staff )
+                            Update User ( Employee )
                         </Button>
                     </div>
                 </form>

@@ -58,13 +58,19 @@ const confirmRevoke = (roleId: number) => {
                         <TableRow>
                             <TableHead>Sl No</TableHead>
                             <TableHead>Name</TableHead>
+                            <TableHead>Permissions</TableHead>
                             <TableHead>Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         <TableRow v-for="(role, index) in roles" :key="index">
-                            <TableCell>{{ index+1 }}</TableCell>
+                            <TableCell>{{ role.id }}</TableCell>
                             <TableCell>{{ role.name }}</TableCell>
+                            <TableCell>
+                                <ul class="list-disc pl-5">
+                                    <li v-for="permission in role.permissions" :key="permission.id">{{ permission.name }}</li>
+                                </ul>
+                            </TableCell>
                             <TableCell class="flex items-center gap-2">
                                 <Link :href="route('roles.permissions.assign', role.id)" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-200"><FolderSync class="h-5 w-5" /></Link>
                                 <button @click="confirmRevoke(role.id)" class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200"><CopyX class="h-5 w-5"/></button>

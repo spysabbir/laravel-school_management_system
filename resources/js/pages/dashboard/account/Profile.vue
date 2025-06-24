@@ -16,14 +16,12 @@ import { toast } from 'vue-sonner'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 type BloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | null;
-type MaritalStatus = 'Single' | 'Married' | 'Divorced' | 'Widowed' | 'Separated' | 'Other' | null;
 
 interface ProfileForm {
     profile_photo: File | null;
     name: string;
     email: string;
     blood_group: BloodGroup;
-    marital_status: MaritalStatus;
     permanent_address: string | null;
     _method: string;
 }
@@ -66,7 +64,6 @@ const form = useForm<ProfileForm>({
     name: user.name,
     email: user.email,
     blood_group: user.blood_group as BloodGroup,
-    marital_status: user.marital_status as MaritalStatus,
     permanent_address: user.permanent_address,
     _method: 'PATCH',
 });
@@ -154,27 +151,6 @@ const submit = () => {
                             </SelectContent>
                         </Select>
                         <InputError class="mt-2" :message="form.errors.blood_group" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="marital_status">Marital Status</Label>
-                        <Select v-model="form.marital_status">
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a marital status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Marital Status</SelectLabel>
-                                    <SelectItem value="Single">Single</SelectItem>
-                                    <SelectItem value="Married">Married</SelectItem>
-                                    <SelectItem value="Divorced">Divorced</SelectItem>
-                                    <SelectItem value="Widowed">Widowed</SelectItem>
-                                    <SelectItem value="Separated">Separated</SelectItem>
-                                    <SelectItem value="Other">Other</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        <InputError class="mt-2" :message="form.errors.marital_status" />
                     </div>
 
                     <div class="grid gap-2">

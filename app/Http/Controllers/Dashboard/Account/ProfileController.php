@@ -28,7 +28,6 @@ class ProfileController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'blood_group' => ['nullable', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
-            'marital_status' => ['nullable', 'string', 'in:Single,Married,Divorced,Widowed,Separated,Other'],
             'permanent_address' => ['nullable', 'string', 'max:500'],
         ]);
 

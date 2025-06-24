@@ -40,7 +40,6 @@ export interface User {
     blood_group: string | null;
     date_of_birth: string | null;
     religion: string | null;
-    marital_status: string | null;
     present_address: string | null;
     permanent_address: string | null;
     email_verified_at: string | null;

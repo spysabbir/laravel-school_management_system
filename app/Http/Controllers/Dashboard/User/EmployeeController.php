@@ -6,24 +6,24 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Designation;
-use App\Models\Teacher;
+use App\Models\Employee;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
-class TeacherController extends Controller
+class EmployeeController extends Controller
 {
     public function index()
     {
-        $users = User::with(['roles', 'teacher'])->where('type', 'Teacher')->get();
-        return Inertia::render('dashboard/user/teacher/Index', [
+        $users = User::with(['roles', 'employee'])->where('type', 'Employee')->get();
+        return Inertia::render('dashboard/user/employee/Index', [
             'users' => $users,
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('dashboard/user/teacher/Create', [
+        return Inertia::render('dashboard/user/employee/Create', [
             'roles' => Role::all(),
             'designations' => Designation::all(),
         ]);
@@ -36,7 +36,7 @@ class TeacherController extends Controller
             'role_ids.*' => 'exists:roles,id',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
-            'national_id_no' => 'required|string|max:20|unique:teachers,national_id_no',
+            'national_id_no' => 'required|string|max:20|unique:employees,national_id_no',
             'joining_date' => 'required|date',
             'type' => 'required|in:Full Time,Part Time,Contract',
             'designation_id' => 'required|exists:designations,id',
@@ -63,10 +63,10 @@ class TeacherController extends Controller
             'phone' => $request->phone,
             'present_address' => $request->present_address,
             'password' => Hash::make($request->password),
-            'type' => 'Teacher',
+            'type' => 'Employee',
         ]);
 
-        Teacher::create([
+        Employee::create([
             'user_id' => $user->id,
             'designation_id' => $request->designation_id,
             'national_id_no' => $request->national_id_no,
@@ -83,13 +83,13 @@ class TeacherController extends Controller
 
         $user->roles()->sync($request->role_ids);
 
-        return redirect()->route('teachers.index')->with('success', 'Teacher created successfully.');
+        return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
     }
 
     public function edit($id)
     {
-        $user = User::with(['roles', 'teacher'])->findOrFail($id);
-        return Inertia::render('dashboard/user/teacher/Edit', [
+        $user = User::with(['roles', 'employee'])->findOrFail($id);
+        return Inertia::render('dashboard/user/employee/Edit', [
             'user' => $user,
             'roles' => Role::all(),
             'designations' => Designation::all(),
@@ -105,7 +105,7 @@ class TeacherController extends Controller
             'role_ids.*' => 'exists:roles,id',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'national_id_no' => 'required|string|max:20|unique:teachers,national_id_no,' . $user->teacher->id,
+            'national_id_no' => 'required|string|max:20|unique:employees,national_id_no,' . $user->employee->id,
             'joining_date' => 'required|date',
             'type' => 'required|in:Full Time,Part Time,Contract',
             'designation_id' => 'required|exists:designations,id',
@@ -132,8 +132,8 @@ class TeacherController extends Controller
             'present_address' => $request->present_address,
         ]);
 
-        $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
-        $teacher->update([
+        $employee = Employee::where('user_id', $user->id)->firstOrFail();
+        $employee->update([
             'designation_id' => $request->designation_id,
             'national_id_no' => $request->national_id_no,
             'joining_date' => $request->joining_date,
@@ -149,6 +149,6 @@ class TeacherController extends Controller
 
         $user->roles()->sync($request->role_ids);
 
-        return redirect()->route('teachers.index')->with('success', 'Teacher updated successfully.');
+        return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
     }
 }

@@ -5,8 +5,7 @@ use App\Http\Controllers\Dashboard\RoleAndPermissionController;
 use App\Http\Controllers\Dashboard\RoutineController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\User\AdminController;
-use App\Http\Controllers\Dashboard\User\TeacherController;
-use App\Http\Controllers\Dashboard\User\StaffController;
+use App\Http\Controllers\Dashboard\User\EmployeeController;
 use App\Http\Controllers\Dashboard\User\StudentController;
 use App\Http\Controllers\Dashboard\User\GuardianController;
 use App\Http\Controllers\Dashboard\Account\PasswordController;
@@ -41,8 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('users', UserController::class);
     Route::resource('admins', AdminController::class);
-    Route::resource('teachers', TeacherController::class);
-    Route::resource('staffs', StaffController::class);
+    Route::resource('employees', EmployeeController::class);
     Route::resource('students', StudentController::class);
     Route::resource('guardians', GuardianController::class);
 

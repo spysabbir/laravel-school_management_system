@@ -22,11 +22,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 const props = defineProps<{
     role: Role;
     permissions: Permission[];
-    assignedPermissions: Array<{ id: number }>;
+    rolePermissions: Permission[];
 }>();
 
 const form = useForm({
-    permission_ids: props.assignedPermissions.map(permission => permission.id.toString()),
+    permission_ids: props.rolePermissions.map(permission => permission.id.toString()),
 });
 
 const groupedPermissions = computed(() => {
@@ -69,8 +69,7 @@ const submit = () => {
                                 <span class="text-lg font-semibold">Assign Permissions for Role: <span class="font-normal">{{ props.role.name }}</span></span>
                             </div>
                             <!-- <div class="flex items-center gap-2 pt-2 sm:pt-0 self-start sm:self-center shrink-0">
-                                <Checkbox id="selectAll"
-                                />
+                                <Checkbox id="selectAll" />
                                 <label for="selectAll" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                     Select All Permissions
                                 </label>
@@ -89,7 +88,7 @@ const submit = () => {
                                 >
                                     <CollapsibleTrigger class="group flex w-full items-center justify-between">
                                         <div class="flex items-center gap-3">
-                                            <!-- <Checkbox :id="`group-${groupName}`"/> -->
+                                            <!-- <Checkbox :id="`group-${groupName}`" /> -->
                                             <label :for="`group-${groupName}`" class="text-sm font-medium capitalize leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                                 {{ groupName }} <span class="text-xs text-muted-foreground">({{ permissionsInGroup.length }} permissions)</span>
                                             </label>

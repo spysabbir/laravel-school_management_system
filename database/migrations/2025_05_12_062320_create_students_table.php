@@ -15,14 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('birth_reg_no')->nullable();
-            $table->string('registration_no')->unique();
             $table->string('father_name')->nullable();
             $table->string('mother_name')->nullable();
-            $table->string('guardian_name')->nullable();
+            $table->foreignId('guardian_user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('guardian_relation')->nullable();
-            $table->string('guardian_phone')->nullable();
-            $table->string('guardian_email')->nullable();
-            $table->string('guardian_address')->nullable();
             $table->enum('status', ['Running', 'Graduated', 'Transferred', 'Dropped Out', 'Suspended', 'Expelled'])->default('Running');
             $table->date('graduation_date')->nullable();
             $table->date('transfer_date')->nullable();
