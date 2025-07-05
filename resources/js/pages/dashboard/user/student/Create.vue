@@ -44,7 +44,7 @@ const form = useForm<{
     shift_id?: number | null;
     student_type?: 'Regular' | 'Irregular';
     academic_year?: string;
-    type?: 'New Admission' | 'Transfer Admission' | 'Re Admission';
+    admission_type?: 'New Admission' | 'Transfer Admission' | 'Re Admission';
     father_name?: string;
     mother_name?: string;
     guardian_name?: string;
@@ -60,7 +60,7 @@ const form = useForm<{
     transfer_reason?: string;
     suspension_reason?: string;
     expulsion_reason?: string;
-    status?: string;
+    status?: 'Running' | 'Graduated' | 'Transferred' | 'Dropped Out' | 'Suspended' | 'Expelled';
 }>({
     name: '',
     email: '',
@@ -93,7 +93,7 @@ const form = useForm<{
     group_id: null,
     shift_id: null,
     academic_year: new Date().toLocaleDateString('en-US', { year: 'numeric' }),
-    type: 'New Admission',
+    admission_type: 'New Admission',
 });
 
 const filteredGroups = computed(() => {
@@ -264,7 +264,23 @@ const submit = () => {
 
                         <div class="grid gap-2">
                             <Label for="guardian_relation">Guardian Relation</Label>
-                            <Input id="guardian_relation" type="text" v-model="form.guardian_relation" placeholder="Guardian Relation" />
+                            <Select v-model="form.guardian_relation">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a guardian relation" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Guardian Relation</SelectLabel>
+                                        <SelectItem value="Father">Father</SelectItem>
+                                        <SelectItem value="Mother">Mother</SelectItem>
+                                        <SelectItem value="Brother">Brother</SelectItem>
+                                        <SelectItem value="Sister">Sister</SelectItem>
+                                        <SelectItem value="Uncle">Uncle</SelectItem>
+                                        <SelectItem value="Aunt">Aunt</SelectItem>
+                                        <SelectItem value="Other">Other</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
                             <InputError class="mt-2" :message="form.errors.guardian_relation" />
                         </div>
 
@@ -333,29 +349,6 @@ const submit = () => {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="academic_year">Academic Year</Label>
-                            <Input id="academic_year" type="text" v-model="form.academic_year" placeholder="Academic Year" />
-                            <InputError :message="form.errors.academic_year" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="type">Type</Label>
-                            <Select id="type" v-model="form.type">
-                                <SelectTrigger class="w-full">
-                                    <SelectValue placeholder="Select type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Types</SelectLabel>
-                                        <SelectItem value="New">New</SelectItem>
-                                        <SelectItem value="Transfer">Transfer</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <InputError :message="form.errors.type" />
-                        </div>
-
-                        <div class="grid gap-2">
                             <Label>Student Type</Label>
                             <RadioGroup v-model="form.student_type" class="grid grid-cols-3 gap-4 mt-1">
                                 <div class="flex items-center space-x-2">
@@ -368,6 +361,42 @@ const submit = () => {
                                 </div>
                             </RadioGroup>
                             <InputError class="mt-2" :message="form.errors.student_type" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="academic_year">Academic Year</Label>
+                            <Select v-model="form.academic_year">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a academic year" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Academic Year</SelectLabel>
+                                        <SelectItem v-for="year in [new Date().getFullYear(), new Date().getFullYear() + 1]" :key="year" :value="year.toString()">
+                                            {{ year }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <InputError class="mt-2" :message="form.errors.academic_year" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="admission_type">Admission Type</Label>
+                            <Select id="admission_type" v-model="form.admission_type">
+                                <SelectTrigger class="w-full">
+                                    <SelectValue placeholder="Select admission type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Admission Types</SelectLabel>
+                                        <SelectItem value="New Admission">New Admission</SelectItem>
+                                        <SelectItem value="Transfer Admission">Transfer Admission</SelectItem>
+                                        <SelectItem value="Re Admission">Re Admission</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <InputError :message="form.errors.admission_type" />
                         </div>
 
                         <div class="grid gap-2">

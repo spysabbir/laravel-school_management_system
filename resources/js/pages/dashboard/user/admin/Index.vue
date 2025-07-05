@@ -366,7 +366,6 @@ const submit = () => {
                                                 <SelectLabel>Status</SelectLabel>
                                                 <SelectItem value="Active">Active</SelectItem>
                                                 <SelectItem value="Inactive">Inactive</SelectItem>
-                                                <SelectItem value="Suspended">Suspended</SelectItem>
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>

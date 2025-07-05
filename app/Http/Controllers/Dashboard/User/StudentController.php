@@ -44,7 +44,6 @@ class StudentController extends Controller
             'date_of_birth' => 'required|date',
             'gender' => 'required|in:Male,Female,Other',
             'birth_reg_no' => 'required|string|max:50|unique:students,birth_reg_no',
-            'registration_no' => 'required|string|max:50|unique:students,registration_no',
             'religion' => 'required|in:Islam,Christianity,Hinduism,Buddhism,Other',
             'phone' => 'required|string|max:15',
             'father_name' => 'required|string|max:255',
@@ -69,9 +68,8 @@ class StudentController extends Controller
             'class_id' => 'required|exists:classes,id',
             'group_id' => 'required|exists:groups,id',
             'shift_id' => 'required|exists:shifts,id',
-            'roll_number' => 'required|string|max:50',
             'academic_year' => 'required|digits:4',
-            'type' => 'required|in:New,Transfer,Re Admission',
+            'admission_type' => 'required|in:New Admission,Transfer Admission,Re Admission',
         ]);
 
         $user = User::create([
@@ -86,18 +84,24 @@ class StudentController extends Controller
             'type' => 'Student',
         ]);
 
+        $guardian = User::create([
+            'name' => $request->guardian_name,
+            'email' => $request->guardian_email,
+            'phone' => $request->guardian_phone,
+            'present_address' => $request->guardian_address,
+            'password' => Hash::make($request->password),
+            'type' => 'Guardian',
+            'created_by' => auth()->id(),
+        ]);
+
         $student = Student::create([
             'user_id' => $user->id,
             'birth_reg_no' => $request->birth_reg_no,
-            'registration_no' => $request->registration_no,
-            'status' => $request->status,
             'father_name' => $request->father_name,
             'mother_name' => $request->mother_name,
-            'guardian_name' => $request->guardian_name,
+            'guardian_user_id' => $guardian->id,
             'guardian_relation' => $request->guardian_relation,
-            'guardian_phone' => $request->guardian_phone,
-            'guardian_email' => $request->guardian_email,
-            'guardian_address' => $request->guardian_address,
+            'status' => $request->status,
             'graduation_date' => $request->graduation_date,
             'transfer_date' => $request->transfer_date,
             'dropout_date' => $request->dropout_date,
@@ -109,7 +113,11 @@ class StudentController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        $roll_number = $student->id . '-' . $request->academic_year;
+        $admissionCount = Admission::where('academic_year', $request->academic_year)
+            ->where('class_id', $request->class_id)
+            ->count();
+        $roll_number = $request->academic_year . '-' . $request->class_id . '-' . $admissionCount + 1 ;
+
         Admission::create([
             'student_id' => $student->id,
             'student_type' => $request->student_type,

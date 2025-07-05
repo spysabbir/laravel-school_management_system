@@ -202,7 +202,6 @@ const footerNavItems = computed(() => {
 
 <template>
     <Sidebar collapsible="icon" variant="inset">
-    {{ can('Read Roles And Permissions') }}
 
         <SidebarHeader>
             <SidebarMenu>

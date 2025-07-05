@@ -79,13 +79,13 @@ const table = useVueTable({
 
 <template>
     <div class="flex items-center p-5">
-        <template v-for="search in searchs" :key="search.key">
+        <!-- <template v-for="search in searchs" :key="search.key">
             <Input :placeholder="`Search by ${search.key}`" v-model="search.value" class="max-w-sm mr-2" />
         </template>
 
         <template v-for="filter in filters" :key="filter.key">
             <DataTableFilter :columnKey="filter.key" :table="table" :options="getFacetedUniqueValues(filter.key)" />
-        </template>
+        </template> -->
 
         <DataTableView :table="table" />
     </div>
@@ -116,7 +116,7 @@ const table = useVueTable({
             </TableBody>
         </Table>
     </div>
-    <div class="py-2 px-5">
+    <!-- <div class="py-2 px-5">
         <DataTablePagination :table="table" />
-    </div>
+    </div> -->
 </template>

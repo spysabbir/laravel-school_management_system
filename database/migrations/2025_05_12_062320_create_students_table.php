@@ -24,6 +24,7 @@ return new class extends Migration
             $table->date('transfer_date')->nullable();
             $table->date('dropout_date')->nullable();
             $table->date('suspension_date')->nullable();
+            $table->date('expulsion_date')->nullable();
             $table->text('transfer_reason')->nullable();
             $table->text('suspension_reason')->nullable();
             $table->text('expulsion_reason')->nullable();
